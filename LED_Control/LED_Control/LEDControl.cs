@@ -23,6 +23,7 @@ namespace LED_Control
             this.Client = Client;
             //WPROWADZIŁEM ZMIANĘ
             //Zmiana druga
+            //Zmiana nr 3
         }
         public LEDControl(TcpClient Client,int i)
         {
