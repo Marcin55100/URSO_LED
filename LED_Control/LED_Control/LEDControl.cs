@@ -21,9 +21,6 @@ namespace LED_Control
             Window = new SelectionWindow(Client);
             Window.Visibility = System.Windows.Visibility.Visible;
             this.Client = Client;
-            //WPROWADZIŁEM ZMIANĘ
-            //Zmiana druga
-            //Zmiana nr 3
         }
         public LEDControl(TcpClient Client,int i)
         {
