@@ -43,7 +43,7 @@ namespace LED_Control
         public MainWindow()
         {
             InitializeComponent();
-            WlanClient wlan = new WlanClient();
+            //WlanClient wlan = new WlanClient();
             InitiateConnection();
             list = new ObservableCollection<LEDSegment>();
             //this.IPBox.Text = "192.168.1.5";

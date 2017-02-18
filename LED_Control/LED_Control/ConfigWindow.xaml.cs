@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using NativeWifi;
+using System.IO;
 
 namespace LED_Control
 {
@@ -34,6 +35,8 @@ namespace LED_Control
         private const int listenPort = 11000;
         public TcpClient Client;
         public static String ServerIP;
+        public static String Message;
+        public String [] IPInfo;
         public ConfigWindow()
         {
             this.Show();
@@ -53,12 +56,13 @@ namespace LED_Control
             }
             this.Infolabel.Content = SSID;
             StartListener();
-            this.IPBox.Text = ServerIP;
+            this.IPBox.Text = IPInfo[0];
+            this.PortBox.Text = IPInfo[1];
         }
 
    
 
-        private static void StartListener()
+        private void StartListener()
         {
             bool done = false;
 
@@ -77,11 +81,13 @@ namespace LED_Control
                     Console.WriteLine("Received broadcast from {0} :\n {1}\n",
                         groupEP.ToString(),
                         Encoding.ASCII.GetString(bytes, 0, bytes.Length));
-                    ServerIP = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
+                    Message = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
 
-                    if (ServerIP=="halo")
+                    if (Message=="halo")
                     {
                         ServerIP = groupEP.ToString();
+                        IPInfo = ServerIP.Split(':');
+                        WriteToFile(IPInfo);
                         done = true;
                     }
                 }
@@ -97,7 +103,25 @@ namespace LED_Control
             }
         }
 
+        private void WriteToFile(String [] IP)
+        {
+            // Create a string array with the lines of text
+            string[] lines = { IP[0], IP[1]};
 
+            // Set a variable to the My Documents path.
+            
+               var systemPath = System.Environment.
+                             GetFolderPath(
+                                 Environment.SpecialFolder.CommonApplicationData
+                             );
+
+            // Write the string array to a new file named "WriteLines.txt".
+            using (StreamWriter outputFile = new StreamWriter(systemPath + @"\ConnectionInfo.txt"))
+            {
+                foreach (string line in lines)
+                    outputFile.WriteLine(line);
+            }
+        }
 
         private void Connect_button_Click(object sender, RoutedEventArgs e)
         {

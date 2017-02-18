@@ -16,7 +16,7 @@
             <StackPanel Width="100" Height="100">
             <Button x:Name="LedButton" Content="LED" Click="LedButton_Click" />
             <Button x:Name="ConfigButton" Content="Konfiguracja" Click="ConfigButton_Click" />
-            <Label x:Name="Infolabel" Content="cos" />
+            <Label x:Name="Infolabel" Content="" />
         </StackPanel>
         
             
