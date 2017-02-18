@@ -7,12 +7,7 @@
         mc:Ignorable="d"
         Title="Konfiguracja sieci" Height="350" Width="525">
     <Grid>
-        <TextBox x:Name="IPBox" HorizontalAlignment="Left" Height="23" Margin="68,135,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
-        <Button x:Name="Connect_button" Content="Połącz" HorizontalAlignment="Left" Margin="315,135,0,0" VerticalAlignment="Top" Width="75" Click="Connect_button_Click"/>
-        <Label x:Name="Infolabel" Content="Label" HorizontalAlignment="Left" Margin="68,196,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="PortBox" HorizontalAlignment="Left" Height="23" Margin="224,134,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="63"/>
-        <Label x:Name="IPlabel" Content="IP:" HorizontalAlignment="Left" Margin="68,86,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="Portlabel" Content="Port:" HorizontalAlignment="Left" Margin="224,86,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Infolabel" Content="Label" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
     </Grid>
 </Window>

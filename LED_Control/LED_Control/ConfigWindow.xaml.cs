@@ -41,8 +41,6 @@ namespace LED_Control
         {
             this.Show();
             InitializeComponent();
-            this.IPBox.Text = "10.2.2.236";
-            this.PortBox.Text = "48569";
             WlanClient wlan = new WlanClient();
             string SSID = "";
             foreach (var item in wlan.Interfaces)
@@ -56,8 +54,9 @@ namespace LED_Control
             }
             this.Infolabel.Content = SSID;
             StartListener();
-            this.IPBox.Text = IPInfo[0];
-            this.PortBox.Text = IPInfo[1];
+            Connect_();
+            //this.IPBox.Text = IPInfo[0];
+            //this.PortBox.Text = IPInfo[1];
         }
 
    
@@ -105,7 +104,7 @@ namespace LED_Control
 
         private void WriteToFile(String [] IP)
         {
-            string[] lines = { IP[0], IP[1]};
+            string[] lines = {IP[0], IP[1]};
             
                var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 
@@ -116,14 +115,14 @@ namespace LED_Control
             }
         }
 
-        private void Connect_button_Click(object sender, RoutedEventArgs e)
+        private void Connect_()
         {
             Client = new TcpClient();
             IPAddress IP;
             int port;
             if (!Client.Connected)
             {
-                if (IPAddress.TryParse(IPBox.Text, out IP) && int.TryParse(PortBox.Text, out port))
+                if (IPAddress.TryParse(IPInfo[0], out IP) && int.TryParse(IPInfo[1], out port))
                 {
                     try
                     {

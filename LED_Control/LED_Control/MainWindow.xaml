@@ -20,7 +20,7 @@
                 <Button x:Name="ConfigButton" Content="Konfiguracja połączenia" Click="ConfigButton_Click" />
                 
         </StackPanel>
-            <StackPanel Width="140" Height="100">
+            <StackPanel Width="140" Height="30">
                 <Label x:Name="Infolabel" Content="cos" />
                 </StackPanel>
             </StackPanel>

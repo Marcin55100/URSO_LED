@@ -57,7 +57,7 @@ namespace LED_Control
             this.NameBox.Visibility = System.Windows.Visibility.Hidden;
             this.endLabel.Visibility = System.Windows.Visibility.Hidden;
         }
-        private void Start()
+        private void Start() // Licznik jest po to, aby można było wstawić migającą diodkę do widoku. Jeszcze nie rozkminione.
         {
             _timer = new Timer(1000);
             _timer.Elapsed += new ElapsedEventHandler(_timer_Elapsed);
@@ -113,24 +113,14 @@ namespace LED_Control
 
         private void Load()
         {
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.DefaultExt = ".xml";
-            dlg.Filter = "XML documents (.xml)|*.xml";
-
-            Nullable<bool> result = dlg.ShowDialog();
-            string filepath = "";
-            if (result == true)
+            var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            try
             {
-                filepath = dlg.FileName;
-
+                XmlFileToList(systemPath + @"\Segments.xml");
             }
-            if (File.Exists(filepath))
+            catch(FileNotFoundException)
             {
-                XmlFileToList(filepath);
-            }
-            else
-            {
-                MessageBox.Show(@"chyba Ty'");
+
             }
 
         }
@@ -139,17 +129,9 @@ namespace LED_Control
         private void startButton_Click(object sender, RoutedEventArgs e)
         {
             // endLabel.Content = "koniec";
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.FileName = "Characters"; //Default file name
-            dlg.DefaultExt = ".xml";
-            dlg.Filter = "XML documents (.xml)|*.xml";
-            Nullable<bool> result = dlg.ShowDialog();
 
-            if (result == true)
-            {
-                string filePath = dlg.FileName;
-                ListToXmlFile(filePath);
-            }
+            var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            ListToXmlFile(systemPath + @"\Segments.xml");
             _timer.Enabled = false;
             ledControl = new LEDControl(Client, list.Count);
             this.Close();
