@@ -105,17 +105,10 @@ namespace LED_Control
 
         private void WriteToFile(String [] IP)
         {
-            // Create a string array with the lines of text
             string[] lines = { IP[0], IP[1]};
-
-            // Set a variable to the My Documents path.
             
-               var systemPath = System.Environment.
-                             GetFolderPath(
-                                 Environment.SpecialFolder.CommonApplicationData
-                             );
+               var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 
-            // Write the string array to a new file named "WriteLines.txt".
             using (StreamWriter outputFile = new StreamWriter(systemPath + @"\ConnectionInfo.txt"))
             {
                 foreach (string line in lines)

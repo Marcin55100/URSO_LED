@@ -38,7 +38,7 @@ namespace LED_Control
         LEDControl ledControl;
         TcpClient Client;
         ObservableCollection<LEDSegment> list;
-         String AdrressIP = "10.2.2.236";
+         String AddressIP = "10.2.2.236";
             String Port = "48569";
         public MainWindow()
         {
@@ -69,9 +69,11 @@ namespace LED_Control
             Client = new TcpClient();
             IPAddress IP;
             int port;
+            ReadConnectionParameters();
+
             if (!Client.Connected)
             {
-                if (IPAddress.TryParse(AdrressIP, out IP) && int.TryParse(Port, out port))
+                if (IPAddress.TryParse(AddressIP, out IP) && int.TryParse(Port, out port))
                 {
                     try
                     {
@@ -88,7 +90,15 @@ namespace LED_Control
             else Infolabel.Content = "Połącznie wciąż aktywne";
         }
 
-    
+        private void ReadConnectionParameters()
+        {
+            var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            System.IO.StreamReader file =new System.IO.StreamReader(systemPath + @"\ConnectionInfo.txt");
+            AddressIP = file.ReadLine();
+            Port = file.ReadLine();
+            file.Close();
+        }
+
 
         private void ConfigButton_Click(object sender, RoutedEventArgs e)
         {
