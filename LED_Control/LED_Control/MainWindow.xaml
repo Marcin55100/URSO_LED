@@ -12,16 +12,17 @@
                 <Style TargetType="{x:Type Button}">
                     <Setter Property="Margin" Value="0,10,0,0"/>
                 </Style>
-            </StackPanel.Resources>
-            <StackPanel Width="100" Height="100">
-            <Button x:Name="LedButton" Content="LED" Click="LedButton_Click" />
-            <Button x:Name="ConfigButton" Content="Konfiguracja" Click="ConfigButton_Click" />
-            <Label x:Name="Infolabel" Content="" />
-        </StackPanel>
-        
-            
-        
 
+            </StackPanel.Resources>
+            <StackPanel Width="140" Height="100">
+                <Button x:Name="LedButton" Content="Sterowanie LED" Click="LedButton_Click" />
+                <Button x:Name="GroupButton" Content="Ustawienia portów" Click="GroupButton_Click" />
+                <Button x:Name="ConfigButton" Content="Konfiguracja połączenia" Click="ConfigButton_Click" />
+                
         </StackPanel>
+            <StackPanel Width="140" Height="100">
+                <Label x:Name="Infolabel" Content="cos" />
+                </StackPanel>
+            </StackPanel>
     </Grid>
 </Window>

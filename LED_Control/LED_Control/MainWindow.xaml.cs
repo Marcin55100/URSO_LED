@@ -150,5 +150,10 @@ namespace LED_Control
             ledControl = new LEDControl(Client, list.Count);
             this.Close();
         }
+
+        private void GroupButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
