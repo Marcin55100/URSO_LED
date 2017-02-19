@@ -51,8 +51,6 @@ namespace LED_Control
                 newOFFBtn.Click += OFFbutton_Click;
                 mainPanel.Children.Add(newONBtn);
                 mainPanel.Children.Add(newOFFBtn);
-
-            
             }
 
         }

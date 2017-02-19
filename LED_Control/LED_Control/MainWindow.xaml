@@ -7,22 +7,29 @@
         mc:Ignorable="d"
         Title="Menu" Height="350" Width="525">
     <Grid>
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-            <StackPanel.Resources>
-                <Style TargetType="{x:Type Button}">
-                    <Setter Property="Margin" Value="0,10,0,0"/>
-                </Style>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-            </StackPanel.Resources>
-            <StackPanel Width="140" Height="100">
-                <Button x:Name="LedButton" Content="Sterowanie LED" Click="LedButton_Click" />
-                <Button x:Name="GroupButton" Content="Ustawienia portów" Click="GroupButton_Click" />
-                <Button x:Name="ConfigButton" Content="Konfiguracja połączenia" Click="ConfigButton_Click" />
-                
-        </StackPanel>
-            <StackPanel Width="140" Height="30">
-                <Label x:Name="Infolabel" Content="cos" />
-                </StackPanel>
+
+        <DockPanel Grid.Row="1" Grid.Column="1">
+
+            <StackPanel DockPanel.Dock="Top">
+                <!-- Width="140" Height="100"-->
+            <Button x:Name="LedButton" Content="Sterowanie LED" Click="LedButton_Click" />
+            <Button x:Name="GroupButton" Content="Ustawienia portów" Click="GroupButton_Click" />
+            <Button x:Name="ConfigButton" Content="Konfiguracja połączenia" Click="ConfigButton_Click" />
+            <Label x:Name="Infolabel" Content="cos" />
             </StackPanel>
+        </DockPanel>
+
     </Grid>
 </Window>
