@@ -8,6 +8,7 @@
         Title="Konfiguracja sieci" Height="350" Width="525">
     <Grid>
         <Label x:Name="Infolabel" Content="Label" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Button x:Name="button" Content="Dalej" HorizontalAlignment="Left" Margin="226,194,0,0" VerticalAlignment="Top" Width="74" Click="button_Click"/>
 
     </Grid>
 </Window>

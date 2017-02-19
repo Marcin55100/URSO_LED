@@ -82,7 +82,7 @@ namespace LED_Control
                         Encoding.ASCII.GetString(bytes, 0, bytes.Length));
                     Message = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
 
-                    if (Message=="halo")
+                    if (Message=="HELLO")
                     {
                         ServerIP = groupEP.ToString();
                         IPInfo = ServerIP.Split(':');
@@ -128,8 +128,6 @@ namespace LED_Control
                     {
                         Client.Connect(IP, port);
                         Infolabel.Content = "Połączono";
-                        LEDControl LED = new LEDControl(Client);
-                        this.Close();
                     }
                     catch (SocketException)
                     {
@@ -141,5 +139,10 @@ namespace LED_Control
             else Infolabel.Content = "Połącznie wciąż aktywne";
         }
 
+        private void button_Click(object sender, RoutedEventArgs e)
+        {
+            LEDControl LED = new LEDControl(Client);
+            this.Close();
+        }
     }
 }
