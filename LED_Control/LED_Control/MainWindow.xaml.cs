@@ -22,7 +22,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
-using NativeWifi;
 using System.IO;
 using System.Xml.Serialization;
 using System.Collections.ObjectModel;
@@ -38,67 +37,27 @@ namespace LED_Control
         LEDControl ledControl;
         TcpClient Client;
         ObservableCollection<LEDSegment> list;
-         String AddressIP = "10.2.2.236";
-            String Port = "48569";
+        //string AddressIP;
+        //const string Port = "23";//"48569";
+
         public MainWindow()
         {
             InitializeComponent();
-            //WlanClient wlan = new WlanClient();
             InitiateConnection();
             list = new ObservableCollection<LEDSegment>();
-            //this.IPBox.Text = "192.168.1.5";
-            //this.PortBox.Text = "48569";
-            //this.LEDon_Button.Visibility = System.Windows.Visibility.Hidden;
-            //this.LEDoff_Button.Visibility = System.Windows.Visibility.Hidden;
-            //WlanClient wlan = new WlanClient();
-            //string SSID = "";
-            //foreach (var item in wlan.Interfaces)
-            //{
-            //    SSID += " " + item.CurrentConnection.profileName;
-            //    //List<Wlan.WlanAvailableNetwork> networks = item.GetAvailableNetworkList(0).ToList();
-            //    //foreach (var network in networks)
-            //    //{
-            //    //    Console.WriteLine("SSID {0}", Encoding.ASCII.GetString(network.dot11Ssid.SSID, 0, (int)network.dot11Ssid.SSIDLength));
-            //    //}
-            //}
-            //this.Infolabel.Content = SSID;
-
         }
-        private void InitiateConnection()
+        public void InitiateConnection()
         {
-            Client = new TcpClient();
             IPAddress IP;
-            int port;
-            ReadConnectionParameters();
+            const int port = 23;
 
-            if (!Client.Connected)
+            if (ConnectionControl.ReadMemoryIP(out IP))
             {
-                if (IPAddress.TryParse(AddressIP, out IP) && int.TryParse(Port, out port))
-                {
-                    try
-                    {
-                        Client.Connect(IP, port);
-                        Infolabel.Content = "Połączono";
-                    }
-                    catch (SocketException)
-                    {
-                        Infolabel.Content = "Serwer niedostępny";
-                    }
-                }
-                else Infolabel.Content = "Błędny format adresu IP lub portu";
+                Client = ConnectionControl.CreateTCPConnection(IP, port);
+                if (Client.Connected) Infolabel.Content = "Połączono";
+                else Infolabel.Content = "Serwer niedostępny";
             }
-            else Infolabel.Content = "Połącznie wciąż aktywne";
         }
-
-        private void ReadConnectionParameters()
-        {
-            var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            System.IO.StreamReader file =new System.IO.StreamReader(systemPath + @"\ConnectionInfo.txt");
-            AddressIP = file.ReadLine();
-            Port = file.ReadLine();
-            file.Close();
-        }
-
 
         private void ConfigButton_Click(object sender, RoutedEventArgs e)
         {
