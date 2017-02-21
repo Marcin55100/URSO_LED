@@ -12,23 +12,40 @@ namespace LED_Control
 {
     class ConnectionControl
     {
-        public static void ConnectBluegiga()
+        const int port = 23;
+
+        public static bool ConnectBluegiga(TcpClient tcp)
         {
-            string APssid = "Bluegiga";
-            string APpassword = "bluegiga";   //te dane mogą być zmieniane i muszą być gdzieś zapamiętane
-            IPAddress IP = null;
-            ReadMemoryIP(out IP);//, APssid, APpassword);
+            bool connection = false;
             Wifi wifi = new Wifi();
-            if (wifi.NoWifiAvailable) Console.WriteLine("No WiFi card was found");
-            else if (wifi.GetAccessPoints().Find(item => item.IsConnected == true).Name == APssid) CreateTCPConnection(IP, 23);
-            else if (wifi.GetAccessPoints().Exists(item => item.Name == APssid))
+            IPAddress IP;
+            string ssid;
+            string password;
+            
+            if (!wifi.NoWifiAvailable)
             {
-                ConnectNetwork(APssid, APpassword, wifi);
-                CreateTCPConnection(IP, 23);
+                if (ReadMemory(out IP, out ssid, out password))
+                {
+                    if (wifi.GetAccessPoints().Find(item => item.IsConnected == true).Name == ssid)
+                    {
+                        tcp = CreateTCPConnection(IP, port, tcp);
+                        if (tcp.Connected) connection = true;
+                    }
+                    else if (wifi.GetAccessPoints().Exists(item => item.Name == ssid))
+                    {
+                        ConnectNetwork(ssid, password, wifi);
+                        if (wifi.ConnectionStatus == WifiStatus.Connected)
+                        {
+                            tcp = CreateTCPConnection(IP, port, tcp);
+                            if (tcp.Connected) connection = true;
+                        }
+                    }
+                }
             }
+            return connection;
         }
 
-        public static bool ReadMemoryIP(out IPAddress IP)//, string APssid, string APpassword)
+        private static bool ReadMemory(out IPAddress IP, out string ssid, out string password)
         {
             bool memory = true;
             var systemPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
@@ -36,30 +53,40 @@ namespace LED_Control
             {
                 StreamReader file = new StreamReader(systemPath + @"\ConnectionInfo.txt");
                 memory = IPAddress.TryParse(file.ReadLine(), out IP);
-                //APssid = file.ReadLine();
-                //APpassword = file.ReadLine();
+                ssid = file.ReadLine();
+                password = file.ReadLine();
                 file.Close();
             }
             catch (Exception)
             {
                 IP = IPAddress.None;
+                ssid = "";
+                password = "";
                 memory = false;
             }
             return memory;
         }
 
-        public static TcpClient CreateTCPConnection(IPAddress IP, int port)
+        private static TcpClient CreateTCPConnection(IPAddress IP, int port, TcpClient tcp)
         {
-            TcpClient tcp = new TcpClient();
+            //TcpClient tcp = new TcpClient();
             try
             {
                 tcp.Connect(IP, port);
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+                try
+                {
+                    IP = UDPListener();
+                    tcp.Connect(IP, port);
+                }
+                catch (Exception) { }
+            }
             return tcp;
         }
 
-        static IPAddress UDPListener()
+        private static IPAddress UDPListener()
         {
             const int listenPort = 11000;
             bool done = false;
@@ -67,8 +94,8 @@ namespace LED_Control
 
             UdpClient listener = new UdpClient(listenPort);
             IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, listenPort);
-            IPEndPoint bluegiga = new IPEndPoint(IPAddress.Broadcast, 23);
-            listener.Send(new byte[] { 1, 2, 3, 4, 5 }, 5, bluegiga);
+            IPEndPoint broadcast = new IPEndPoint(IPAddress.Broadcast, port);
+            listener.Send(new byte[] { 1, 2, 3, 4, 5 }, 5, broadcast);
             try
             {
                 while (!done)
@@ -79,11 +106,11 @@ namespace LED_Control
                     Console.WriteLine("Received broadcast from {0} :\n {1}\n",
                         groupEP.ToString(),
                         Encoding.ASCII.GetString(bytes, 0, bytes.Length));
-                    ServerIP = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
+                    string response = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
 
-                    if (ServerIP == "HELLO")
+                    if (response == "HELLO")
                     {
-                        ServerIP = groupEP.ToString();
+                        ServerIP = groupEP.ToString().Split(':')[0];
                         done = true;
                     }
                 }
@@ -96,10 +123,10 @@ namespace LED_Control
             {
                 listener.Close();
             }
-            return IPAddress.Parse(ServerIP.Split(':')[0]);
+            return IPAddress.Parse(ServerIP);
         }
 
-        static void ConnectNetwork(string ssid, string password, Wifi wifi)
+        private static void ConnectNetwork(string ssid, string password, Wifi wifi)
         {
             if (wifi.NoWifiAvailable) Console.WriteLine("No WiFi card was found");
             else
