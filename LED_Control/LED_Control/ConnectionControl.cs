@@ -41,6 +41,7 @@ namespace LED_Control
                         }
                     }
                 }
+                if (connection) SaveMemory(((IPEndPoint)tcp.Client.RemoteEndPoint).Address, ssid, password);
             }
             return connection;
         }
@@ -65,6 +66,17 @@ namespace LED_Control
                 memory = false;
             }
             return memory;
+        }
+
+        private static void SaveMemory(IPAddress IP, string ssid, string password)
+        {
+            var systemPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            using (StreamWriter outputFile = new StreamWriter(systemPath + @"\ConnectionInfo.txt"))
+            {
+                outputFile.WriteLine(IP.ToString());
+                outputFile.WriteLine(ssid);
+                outputFile.WriteLine(password);
+            }
         }
 
         private static TcpClient CreateTCPConnection(IPAddress IP, int port, TcpClient tcp)
@@ -141,6 +153,20 @@ namespace LED_Control
                 }
                 accessPoint.Connect(authRequest, overwrite);
             }
+        }
+
+        public static List<string> GetWifiNetworks()
+        {
+            List<string> networks = new List<string>();
+            Wifi wifi = new Wifi();
+            if (!wifi.NoWifiAvailable)
+            {
+                foreach (var accessPoint in wifi.GetAccessPoints())
+                {
+                    networks.Add(accessPoint.Name);
+                }
+            }
+            return networks;
         }
     }
 }

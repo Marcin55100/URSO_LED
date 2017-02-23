@@ -22,7 +22,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
-using NativeWifi;
+using SimpleWifi;
 using System.IO;
 
 namespace LED_Control
@@ -41,22 +41,20 @@ namespace LED_Control
         {
             this.Show();
             InitializeComponent();
-            WlanClient wlan = new WlanClient();
-            string SSID = "";
-            foreach (var item in wlan.Interfaces)
+
+            Wifi wifi = new Wifi();
+            if (!wifi.NoWifiAvailable)
             {
-                SSID += " " + item.CurrentConnection.profileName;
-                //List<Wlan.WlanAvailableNetwork> networks = item.GetAvailableNetworkList(0).ToList();
-                //foreach (var network in networks)
-                //{
-                //    Console.WriteLine("SSID {0}", Encoding.ASCII.GetString(network.dot11Ssid.SSID, 0, (int)network.dot11Ssid.SSIDLength));
-                //}
+                foreach (var accessPoint in wifi.GetAccessPoints())
+                {
+                    ListBoxItem network = new ListBoxItem();
+                    network.Content = accessPoint.Name;
+                    listBox.Items.Add(network);
+                }
             }
-            this.Infolabel.Content = SSID;
-            StartListener();
-            Connect_();
-            //this.IPBox.Text = IPInfo[0];
-            //this.PortBox.Text = IPInfo[1];
+
+            //StartListener();
+            //Connect_();
         }
 
    
@@ -67,7 +65,7 @@ namespace LED_Control
 
             UdpClient listener = new UdpClient(listenPort);
             IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, listenPort);
-            IPEndPoint bluegiga = new IPEndPoint(IPAddress.Broadcast, 55056);
+            IPEndPoint bluegiga = new IPEndPoint(IPAddress.Broadcast, 23);
             listener.Send(new byte[] { 1, 2, 3, 4, 5 }, 5, bluegiga);
             try
             {
