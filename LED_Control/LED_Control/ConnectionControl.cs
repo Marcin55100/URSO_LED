@@ -20,20 +20,22 @@ namespace LED_Control
             Wifi wifi = new Wifi();
             IPAddress IP;
             string ssid;
-            string password;
             
             if (!wifi.NoWifiAvailable)
             {
-                if (ReadMemory(out IP, out ssid, out password))
+                //próba połączenia z BG w sieci do której urządzenie jest podłączone
+                if (wifi.ConnectionStatus == WifiStatus.Connected)
                 {
-                    if (wifi.GetAccessPoints().Find(item => item.IsConnected == true).Name == ssid)
+                    tcp = CreateTCPConnection(UDPListener(), port, tcp);
+                    if (tcp.Connected) connection = true;
+                }
+                //sprawdzenie czy aplikacja ma w pamięci parametry połączenia
+                if (!connection && ReadMemory(out IP, out ssid))
+                {
+                    //próba połącznia z BG w sieci z pamięci aplikacji (jeśli sieć znajduje się na liście dostępnych AP)
+                    if (!connection && wifi.GetAccessPoints().Exists(item => item.Name == ssid))
                     {
-                        tcp = CreateTCPConnection(IP, port, tcp);
-                        if (tcp.Connected) connection = true;
-                    }
-                    else if (wifi.GetAccessPoints().Exists(item => item.Name == ssid))
-                    {
-                        ConnectNetwork(ssid, password, wifi);
+                        ConnectNetwork(wifi, ssid);
                         if (wifi.ConnectionStatus == WifiStatus.Connected)
                         {
                             tcp = CreateTCPConnection(IP, port, tcp);
@@ -41,12 +43,12 @@ namespace LED_Control
                         }
                     }
                 }
-                if (connection) SaveMemory(((IPEndPoint)tcp.Client.RemoteEndPoint).Address, ssid, password);
+                if (connection) SaveMemory(((IPEndPoint)tcp.Client.RemoteEndPoint).Address, wifi.GetAccessPoints().Find(item => item.IsConnected).Name);
             }
             return connection;
         }
 
-        private static bool ReadMemory(out IPAddress IP, out string ssid, out string password)
+        private static bool ReadMemory(out IPAddress IP, out string ssid)
         {
             bool memory = true;
             var systemPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
@@ -55,33 +57,29 @@ namespace LED_Control
                 StreamReader file = new StreamReader(systemPath + @"\ConnectionInfo.txt");
                 memory = IPAddress.TryParse(file.ReadLine(), out IP);
                 ssid = file.ReadLine();
-                password = file.ReadLine();
                 file.Close();
             }
             catch (Exception)
             {
                 IP = IPAddress.None;
                 ssid = "";
-                password = "";
                 memory = false;
             }
             return memory;
         }
 
-        private static void SaveMemory(IPAddress IP, string ssid, string password)
+        private static void SaveMemory(IPAddress IP, string ssid)
         {
             var systemPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             using (StreamWriter outputFile = new StreamWriter(systemPath + @"\ConnectionInfo.txt"))
             {
                 outputFile.WriteLine(IP.ToString());
                 outputFile.WriteLine(ssid);
-                outputFile.WriteLine(password);
             }
         }
 
         private static TcpClient CreateTCPConnection(IPAddress IP, int port, TcpClient tcp)
         {
-            //TcpClient tcp = new TcpClient();
             try
             {
                 tcp.Connect(IP, port);
@@ -101,31 +99,19 @@ namespace LED_Control
         private static IPAddress UDPListener()
         {
             const int listenPort = 11000;
-            bool done = false;
-            string ServerIP = null;
+            IPAddress ServerIP = IPAddress.Any;
 
-            UdpClient listener = new UdpClient(listenPort);
+            UdpClient udp = new UdpClient(listenPort);
+            udp.Client.ReceiveTimeout = 1000;
             IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, listenPort);
             IPEndPoint broadcast = new IPEndPoint(IPAddress.Broadcast, port);
-            listener.Send(new byte[] { 1, 2, 3, 4, 5 }, 5, broadcast);
+            udp.Send(new byte[] { 1, 2, 3, 4, 5 }, 5, broadcast);
             try
             {
-                while (!done)
-                {
-                    Console.WriteLine("Waiting for broadcast");
-                    byte[] bytes = listener.Receive(ref groupEP);
+                byte[] bytes = udp.Receive(ref groupEP);
+                string response = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
 
-                    Console.WriteLine("Received broadcast from {0} :\n {1}\n",
-                        groupEP.ToString(),
-                        Encoding.ASCII.GetString(bytes, 0, bytes.Length));
-                    string response = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
-
-                    if (response == "HELLO")
-                    {
-                        ServerIP = groupEP.ToString().Split(':')[0];
-                        done = true;
-                    }
-                }
+                if (response == "HELLO") ServerIP = IPAddress.Parse(groupEP.ToString().Split(':')[0]);
             }
             catch (Exception e)
             {
@@ -133,12 +119,12 @@ namespace LED_Control
             }
             finally
             {
-                listener.Close();
+                udp.Close();
             }
-            return IPAddress.Parse(ServerIP);
+            return ServerIP;
         }
 
-        private static void ConnectNetwork(string ssid, string password, Wifi wifi)
+        public static void ConnectNetwork(Wifi wifi, string ssid, string password = "")
         {
             if (wifi.NoWifiAvailable) Console.WriteLine("No WiFi card was found");
             else

@@ -37,18 +37,20 @@ namespace LED_Control
         public static String ServerIP;
         public static String Message;
         public String [] IPInfo;
+        Wifi wifi;
         public ConfigWindow()
         {
-            this.Show();
+            Show();
             InitializeComponent();
 
-            Wifi wifi = new Wifi();
+            wifi = new Wifi();
             if (!wifi.NoWifiAvailable)
             {
                 foreach (var accessPoint in wifi.GetAccessPoints())
                 {
                     ListBoxItem network = new ListBoxItem();
                     network.Content = accessPoint.Name;
+                    if (accessPoint.IsConnected) network.FontWeight = FontWeights.Bold;
                     listBox.Items.Add(network);
                 }
             }
@@ -141,6 +143,21 @@ namespace LED_Control
         {
             LEDControl LED = new LEDControl(Client);
             this.Close();
+        }
+
+        private void ConnectButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (listBox.SelectedItem != null)
+            {
+                ListBoxItem network = listBox.SelectedItem as ListBoxItem;
+                string password = "";
+                if (!wifi.GetAccessPoints().Find(item => item.Name == network.Content.ToString()).HasProfile)
+                {
+                    //okienko do wpisania hasła
+                }
+                ConnectionControl.ConnectNetwork(wifi, network.Content.ToString(), password);
+                ConnectionControl.ConnectBluegiga(Client); //Client - brak instancji
+            }
         }
     }
 }
