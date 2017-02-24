@@ -37,8 +37,6 @@ namespace LED_Control
         LEDControl ledControl;
         TcpClient Client;
         ObservableCollection<LEDSegment> list;
-        //string AddressIP;
-        //const string Port = "23";//"48569";
 
         public MainWindow()
         {
@@ -75,24 +73,16 @@ namespace LED_Control
 
         private void Load()
         {
-           // Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-           // dlg.DefaultExt = ".xml";
-          //  dlg.Filter = "XML documents (.xml)|*.xml";
+            var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            
 
-         //   Nullable<bool> result = dlg.ShowDialog();
-            string filepath = "C:\\Users\\Marcin\\Documents\\Visual Studio 2015\\Projects\\LED_Control\\LED_Control\\Save_configuration.xml";
-          //  if (result == true)
-           // {
-            //    filepath = dlg.FileName;
-
-            //}
-            if (File.Exists(filepath))
+            if (File.Exists(systemPath + @"\Segments.xml"))
             {
-                XmlFileToList(filepath);
+                XmlFileToList(systemPath + @"\Segments.xml");
             }
             else
             {
-                MessageBox.Show(@"chyba Ty'");
+                MessageBox.Show(@"Nie ma takiego pliku.");
             }
 
         }

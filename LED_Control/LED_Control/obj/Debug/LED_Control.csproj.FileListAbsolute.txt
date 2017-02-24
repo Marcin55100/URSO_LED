@@ -59,3 +59,4 @@ C:\Users\Jalo\Documents\GitHub\URSO_LED\LED_Control\LED_Control\obj\Debug\LED_Co
 C:\Users\Jalo\Documents\GitHub\URSO_LED\LED_Control\LED_Control\obj\Debug\LED_Control.exe
 C:\Users\Jalo\Documents\GitHub\URSO_LED\LED_Control\LED_Control\obj\Debug\LED_Control.pdb
 C:\Users\Jalo\Documents\GitHub\URSO_LED\LED_Control\LED_Control\bin\Debug\SimpleWifi.dll
+C:\Users\Marcin\Documents\GitHub\URSO_LED\LED_Control\LED_Control\bin\Debug\SimpleWifi.dll

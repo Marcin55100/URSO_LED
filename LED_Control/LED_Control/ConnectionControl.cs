@@ -23,7 +23,7 @@ namespace LED_Control
             
             if (!wifi.NoWifiAvailable)
             {
-                //próba połączenia z BG w sieci do której urządzenie jest podłączone
+                //próba połączenia z BG w sieci, do której urządzenie jest podłączone
                 if (wifi.ConnectionStatus == WifiStatus.Connected)
                 {
                     tcp = CreateTCPConnection(UDPListener(), port, tcp);
