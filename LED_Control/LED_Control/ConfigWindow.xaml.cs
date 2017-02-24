@@ -42,6 +42,9 @@ namespace LED_Control
         {
             Show();
             InitializeComponent();
+            passwordBox.Visibility = System.Windows.Visibility.Hidden;
+            ConnectButton.Visibility = System.Windows.Visibility.Hidden;
+
 
             wifi = new Wifi();
             if (!wifi.NoWifiAvailable)
@@ -153,10 +156,27 @@ namespace LED_Control
                 string password = "";
                 if (!wifi.GetAccessPoints().Find(item => item.Name == network.Content.ToString()).HasProfile)
                 {
+                    password = passwordBox.Text;
                     //okienko do wpisania hasła
                 }
                 ConnectionControl.ConnectNetwork(wifi, network.Content.ToString(), password);
                 ConnectionControl.ConnectBluegiga(Client); //Client - brak instancji
+            }
+        }
+
+        private void listBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ListBoxItem selectedNetwork = new ListBoxItem();
+            selectedNetwork = (ListBoxItem)listBox.SelectedItem;
+            if (selectedNetwork.FontWeight == FontWeights.Bold)
+            {
+                passwordBox.Visibility = System.Windows.Visibility.Hidden;
+                ConnectButton.Visibility = System.Windows.Visibility.Hidden;
+            }
+            else
+            {
+                passwordBox.Visibility = System.Windows.Visibility.Visible;
+                ConnectButton.Visibility = System.Windows.Visibility.Visible;
             }
         }
     }

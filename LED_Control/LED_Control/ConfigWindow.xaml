@@ -7,10 +7,11 @@
         mc:Ignorable="d"
         Title="Konfiguracja sieci" Height="350" Width="525">
     <Grid>
-        <Label x:Name="Infolabel" Content="Label" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <Button x:Name="button" Content="Dalej" HorizontalAlignment="Left" Margin="226,194,0,0" VerticalAlignment="Top" Width="74" Click="button_Click"/>
-        <ListBox x:Name="listBox" HorizontalAlignment="Left" Height="300" Margin="10,10,0,0" VerticalAlignment="Top" Width="211"/>
-        <Button x:Name="ConnectButton" Content="Połącz" HorizontalAlignment="Left" Margin="262,81,0,0" VerticalAlignment="Top" Width="75" Click="ConnectButton_Click"/>
+        <Label x:Name="Infolabel" Content="Label" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="277,257,202,37"/>
+        <Button x:Name="button" Content="Dalej" HorizontalAlignment="Left" Margin="407,259,0,0" VerticalAlignment="Top" Width="74" Click="button_Click"/>
+        <ListBox x:Name="listBox" SelectionChanged="listBox_SelectionChanged" HorizontalAlignment="Left" Height="300" Margin="10,10,0,0" VerticalAlignment="Top" Width="211"/>
+        <Button x:Name="ConnectButton" Content="Połącz" HorizontalAlignment="Left" Margin="263,187,0,0" VerticalAlignment="Top" Width="75" Click="ConnectButton_Click"/>
+        <TextBox x:Name="passwordBox" HorizontalAlignment="Left" Height="23" Margin="240,146,0,0" TextWrapping="Wrap" Text="Podaj hasło..." VerticalAlignment="Top" Width="120"/>
 
     </Grid>
 </Window>
