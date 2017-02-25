@@ -16,6 +16,7 @@ using System.Collections.ObjectModel;
 using System.Timers;
 using System.IO;
 using System.Xml.Serialization;
+using System.Collections;
 
 namespace LED_Control
 {
@@ -98,6 +99,7 @@ namespace LED_Control
 
         private void XmlFileToList(string filepath)
         {
+            list.Clear();
             using (var sr = new StreamReader(filepath))
             {
                 var deserializer = new XmlSerializer(typeof(ObservableCollection<LEDSegment>));
@@ -114,6 +116,16 @@ namespace LED_Control
         private void Load()
         {
             var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            // string[] filePaths = Directory.GetFiles(systemPath);
+            foreach (var file in Directory.EnumerateFiles(systemPath, "*.xml"))
+            {
+                string fileName_ = file.ToString().Replace(systemPath.ToString()+"\\","");
+                ListBoxItem fileName = new ListBoxItem();
+                fileName.Content = fileName_;
+                fileBox.Items.Add(fileName);
+            }
+           // filePaths =Array.FindAll(filePaths,s =>s.Contains("xml"));
+
             try
             {
                 XmlFileToList(systemPath + @"\Segments.xml");
@@ -168,6 +180,14 @@ namespace LED_Control
             this.NameLabel.Visibility = System.Windows.Visibility.Visible;
             this.NameBox.Visibility = System.Windows.Visibility.Visible;
             _timer.Enabled = true;
+        }
+
+        private void fileBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            ListBoxItem selectedNetwork = new ListBoxItem();
+            selectedNetwork = (ListBoxItem)fileBox.SelectedItem;
+            XmlFileToList(systemPath + "\\" + selectedNetwork.Content);
         }
     }
 }

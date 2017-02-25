@@ -26,10 +26,12 @@
                 <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
                 <Button Name="addButton" Content="Dodaj" Width="50" HorizontalAlignment="Left" Click="addButton_Click"/>
                 <Button x:Name="button" Content="Usuń" Width="50" Click="deleteButton" />
+                <Button x:Name="startButton" Content="Rozpocznij" Width="100" HorizontalAlignment="Center" Click="startButton_Click"/>
                 </StackPanel>
             </StackPanel>
-            <Button Name="startButton" Content="Rozpocznij" Width="100" Margin="0,30,5,0" HorizontalAlignment="Center" Click="startButton_Click"/>
+            
             <Label Name="endLabel" Content=""  />
+            <ListBox x:Name="fileBox" SelectionChanged="fileBox_SelectionChanged" Height="100"/>
         </StackPanel>
 
         <ListView Name="listView" Grid.Column="1">
