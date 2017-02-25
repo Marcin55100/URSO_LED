@@ -102,7 +102,7 @@ namespace LED_Control
             IPAddress ServerIP = IPAddress.Any;
 
             UdpClient udp = new UdpClient(listenPort);
-            udp.Client.ReceiveTimeout = 1000;
+            udp.Client.ReceiveTimeout = 5000;
             IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, listenPort);
             IPEndPoint broadcast = new IPEndPoint(IPAddress.Broadcast, port);
             udp.Send(new byte[] { 1, 2, 3, 4, 5 }, 5, broadcast);

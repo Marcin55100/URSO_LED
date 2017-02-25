@@ -38,31 +38,39 @@ namespace LED_Control
         public static String Message;
         public String [] IPInfo;
         Wifi wifi;
-        public ConfigWindow()
+        public ConfigWindow(TcpClient Client)
         {
             Show();
             InitializeComponent();
             passwordBox.Visibility = System.Windows.Visibility.Hidden;
             ConnectButton.Visibility = System.Windows.Visibility.Hidden;
-
+            this.Client = Client;
 
             wifi = new Wifi();
+            WifiSearch(wifi);
+            if (ConnectionControl.ConnectBluegiga(Client) == true) Infolabel.Content = "Połączono";
+
+            //StartListener();
+            //Connect_();
+        }
+
+        private void WifiSearch(Wifi wifi)
+        {
+            listBox.Items.Clear();
             if (!wifi.NoWifiAvailable)
             {
                 foreach (var accessPoint in wifi.GetAccessPoints())
                 {
                     ListBoxItem network = new ListBoxItem();
                     network.Content = accessPoint.Name;
-                    if (accessPoint.IsConnected) network.FontWeight = FontWeights.Bold;
+                    if (accessPoint.IsConnected)
+                        network.FontWeight = FontWeights.Bold;
+
                     listBox.Items.Add(network);
                 }
             }
 
-            //StartListener();
-            //Connect_();
         }
-
-   
 
         private void StartListener()
         {
@@ -142,7 +150,7 @@ namespace LED_Control
             else Infolabel.Content = "Połącznie wciąż aktywne";
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
+        private void nextButton_Click(object sender, RoutedEventArgs e)
         {
             LEDControl LED = new LEDControl(Client);
             this.Close();
@@ -167,17 +175,26 @@ namespace LED_Control
         private void listBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ListBoxItem selectedNetwork = new ListBoxItem();
-            selectedNetwork = (ListBoxItem)listBox.SelectedItem;
-            if (selectedNetwork.FontWeight == FontWeights.Bold)
-            {
-                passwordBox.Visibility = System.Windows.Visibility.Hidden;
-                ConnectButton.Visibility = System.Windows.Visibility.Hidden;
+            try {
+                selectedNetwork = (ListBoxItem)listBox.SelectedItem;
+                if (selectedNetwork.FontWeight == FontWeights.Bold)
+                {
+                    passwordBox.Visibility = System.Windows.Visibility.Hidden;
+                    ConnectButton.Visibility = System.Windows.Visibility.Hidden;
+                }
+                else
+                {
+                    passwordBox.Visibility = System.Windows.Visibility.Visible;
+                    ConnectButton.Visibility = System.Windows.Visibility.Visible;
+                }
             }
-            else
-            {
-                passwordBox.Visibility = System.Windows.Visibility.Visible;
-                ConnectButton.Visibility = System.Windows.Visibility.Visible;
-            }
+            catch(NullReferenceException)
+            { }
+        }
+
+        private void refreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            WifiSearch(wifi);
         }
     }
 }

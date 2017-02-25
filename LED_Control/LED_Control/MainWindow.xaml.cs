@@ -53,7 +53,7 @@ namespace LED_Control
 
         private void ConfigButton_Click(object sender, RoutedEventArgs e)
         {
-            configWindow = new ConfigWindow();
+            configWindow = new ConfigWindow(Client);
             this.Hide();
         }
         private void XmlFileToList(string filepath)
