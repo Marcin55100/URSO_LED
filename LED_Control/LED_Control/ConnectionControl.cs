@@ -126,7 +126,8 @@ namespace LED_Control
 
         public static void ConnectNetwork(Wifi wifi, string ssid, string password = "")
         {
-            if (wifi.NoWifiAvailable) Console.WriteLine("No WiFi card was found");
+            if (wifi.NoWifiAvailable) ;
+
             else
             {
                 var accessPoint = wifi.GetAccessPoints().Find(item => item.Name == ssid);

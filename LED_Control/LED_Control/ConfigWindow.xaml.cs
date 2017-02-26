@@ -37,6 +37,7 @@ namespace LED_Control
         public static String ServerIP;
         public static String Message;
         public String [] IPInfo;
+        public ListBoxItem lastNetwork;
         Wifi wifi;
         public ConfigWindow(TcpClient Client)
         {
@@ -64,7 +65,10 @@ namespace LED_Control
                     ListBoxItem network = new ListBoxItem();
                     network.Content = accessPoint.Name;
                     if (accessPoint.IsConnected)
+                    {
                         network.FontWeight = FontWeights.Bold;
+                        lastNetwork = network;
+                    }
 
                     listBox.Items.Add(network);
                 }
@@ -158,6 +162,9 @@ namespace LED_Control
 
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
+            //int index=listBox.Items.IndexOf(lastNetwork);
+            lastNetwork.FontWeight = FontWeights.Regular;
+            // listBox.Items[index]
             if (listBox.SelectedItem != null)
             {
                 ListBoxItem network = listBox.SelectedItem as ListBoxItem;
@@ -165,10 +172,14 @@ namespace LED_Control
                 if (!wifi.GetAccessPoints().Find(item => item.Name == network.Content.ToString()).HasProfile)
                 {
                     password = passwordBox.Text;
-                    //okienko do wpisania hasła
                 }
-                ConnectionControl.ConnectNetwork(wifi, network.Content.ToString(), password);
-                ConnectionControl.ConnectBluegiga(Client); //Client - brak instancji
+                ConnectionControl.ConnectNetwork(wifi, network.Content.ToString(), password); 
+                
+                if (ConnectionControl.ConnectBluegiga(Client) == true)
+                    Infolabel.Content = "Połączono";
+
+                WifiSearch(wifi);
+
             }
         }
 
@@ -195,6 +206,10 @@ namespace LED_Control
         private void refreshButton_Click(object sender, RoutedEventArgs e)
         {
             WifiSearch(wifi);
+        }
+
+        private void backButton_Click(object sender, RoutedEventArgs e)
+        {
         }
     }
 }
