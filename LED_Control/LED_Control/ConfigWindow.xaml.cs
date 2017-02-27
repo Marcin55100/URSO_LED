@@ -173,11 +173,17 @@ namespace LED_Control
                 {
                     password = passwordBox.Text;
                 }
-                ConnectionControl.ConnectNetwork(wifi, network.Content.ToString(), password); 
-                
+                ConnectionControl.ConnectNetwork(wifi, network.Content.ToString(), password);
                 if (ConnectionControl.ConnectBluegiga(Client) == true)
+                {
+                    MessageBoxResult result = MessageBox.Show("Połączono. Czy chcesz skonfigurować porty?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if(result== MessageBoxResult.Yes)
+                    {
+                        LEDControl LED = new LEDControl(Client);
+                        this.Close();
+                    }
                     Infolabel.Content = "Połączono";
-
+                }
                 WifiSearch(wifi);
 
             }
