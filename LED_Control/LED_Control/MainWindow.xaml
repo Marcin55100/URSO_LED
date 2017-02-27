@@ -17,7 +17,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        
+       
         <Grid Grid.Column="1" Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -28,8 +28,10 @@
             <Button x:Name="LedButton" Grid.Row="0"  Content="Sterowanie LED" Click="LedButton_Click" />
             <Button x:Name="GroupButton"  Grid.Row="1"  Content="Ustawienia portów" Click="GroupButton_Click" />
             <Button x:Name="ConfigButton"  Grid.Row="2"  Content="Konfiguracja połączenia" Click="ConfigButton_Click" />
-            <Label x:Name="Infolabel" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Row="3" Content="cos" />
-            
+            <!--<Label x:Name="Infolabel" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Row="3" Content="cos" /> -->
+            <Viewbox Stretch="Uniform" Grid.Row="3">
+                <TextBlock Name="Infolabel" Text="Test" />
+            </Viewbox>
         </Grid>
         <!--
         <DockPanel VerticalAlignment="Stretch" Grid.Row="1" Grid.Column="1" Height="Auto">

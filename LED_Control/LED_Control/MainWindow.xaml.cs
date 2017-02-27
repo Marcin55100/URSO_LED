@@ -47,8 +47,8 @@ namespace LED_Control
         public void InitiateConnection()
         {
             Client = new TcpClient();
-            if (ConnectionControl.ConnectBluegiga(Client)) Infolabel.Content = "Połączono";
-            else Infolabel.Content = "Serwer niedostępny";
+            if (ConnectionControl.ConnectBluegiga(Client)) Infolabel.Text = "Połączono";
+            else Infolabel.Text = "Serwer niedostępny";
         }
 
         private void ConfigButton_Click(object sender, RoutedEventArgs e)
