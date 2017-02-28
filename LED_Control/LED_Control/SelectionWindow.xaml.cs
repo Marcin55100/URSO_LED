@@ -55,8 +55,7 @@ namespace LED_Control
         {
             this.mainStack.Visibility = System.Windows.Visibility.Hidden;
             this.NameLabel.Visibility = System.Windows.Visibility.Hidden;
-            this.NameBox.Visibility = System.Windows.Visibility.Hidden;
-            this.endLabel.Visibility = System.Windows.Visibility.Hidden;
+            this.NameBox.Visibility = System.Windows.Visibility.Hidden;    
         }
         private void Start() // Licznik jest po to, aby można było wstawić migającą diodkę do widoku. Jeszcze nie rozkminione.
         {
@@ -117,6 +116,7 @@ namespace LED_Control
         {
             var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             // string[] filePaths = Directory.GetFiles(systemPath);
+            fileBox.Items.Clear();
             foreach (var file in Directory.EnumerateFiles(systemPath, "*.xml"))
             {
                 string fileName_ = file.ToString().Replace(systemPath.ToString()+"\\","");
@@ -140,9 +140,7 @@ namespace LED_Control
 
         private void startButton_Click(object sender, RoutedEventArgs e)
         {
-            // endLabel.Content = "koniec";
-
-            var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);     
             ListToXmlFile(systemPath + @"\Segments.xml");
             _timer.Enabled = false;
             ledControl = new LEDControl(Client, list.Count);
@@ -188,6 +186,13 @@ namespace LED_Control
             ListBoxItem selectedNetwork = new ListBoxItem();
             selectedNetwork = (ListBoxItem)fileBox.SelectedItem;
             XmlFileToList(systemPath + "\\" + selectedNetwork.Content);
+        }
+
+        private void saveButton_Click(object sender, RoutedEventArgs e)
+        {
+             var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);     
+             ListToXmlFile(systemPath +"\\"+ConfigNameBox.Text+".xml");
+             Load();
         }
     }
 }

@@ -20,31 +20,36 @@ namespace LED_Control
             Wifi wifi = new Wifi();
             IPAddress IP;
             string ssid;
-            
-            if (!wifi.NoWifiAvailable)
+            if (tcp.Connected == false)
             {
-                //próba połączenia z BG w sieci, do której urządzenie jest podłączone
-                if (wifi.ConnectionStatus == WifiStatus.Connected)
+                if (!wifi.NoWifiAvailable)
                 {
-                    tcp = CreateTCPConnection(UDPListener(), port, tcp);
-                    if (tcp.Connected) connection = true;
-                }
-                //sprawdzenie czy aplikacja ma w pamięci parametry połączenia
-                if (!connection && ReadMemory(out IP, out ssid))
-                {
-                    //próba połącznia z BG w sieci z pamięci aplikacji (jeśli sieć znajduje się na liście dostępnych AP)
-                    if (!connection && wifi.GetAccessPoints().Exists(item => item.Name == ssid))
+                    //próba połączenia z BG w sieci, do której urządzenie jest podłączone
+                    if (wifi.ConnectionStatus == WifiStatus.Connected)
                     {
-                        ConnectNetwork(wifi, ssid);
-                        if (wifi.ConnectionStatus == WifiStatus.Connected)
+                        tcp = CreateTCPConnection(UDPListener(), port, tcp);
+                        if (tcp.Connected) connection = true;
+                    }
+                    //sprawdzenie czy aplikacja ma w pamięci parametry połączenia
+                    if (!connection && ReadMemory(out IP, out ssid))
+                    {
+                        //próba połącznia z BG w sieci z pamięci aplikacji (jeśli sieć znajduje się na liście dostępnych AP)
+                        if (!connection && wifi.GetAccessPoints().Exists(item => item.Name == ssid))
                         {
-                            tcp = CreateTCPConnection(IP, port, tcp);
-                            if (tcp.Connected) connection = true;
+                            ConnectNetwork(wifi, ssid);
+                            if (wifi.ConnectionStatus == WifiStatus.Connected)
+                            {
+                                tcp = CreateTCPConnection(IP, port, tcp);
+                                if (tcp.Connected) connection = true;
+                            }
                         }
                     }
+                    if (connection) SaveMemory(((IPEndPoint)tcp.Client.RemoteEndPoint).Address, wifi.GetAccessPoints().Find(item => item.IsConnected).Name);
                 }
-                if (connection) SaveMemory(((IPEndPoint)tcp.Client.RemoteEndPoint).Address, wifi.GetAccessPoints().Find(item => item.IsConnected).Name);
             }
+            else
+                connection = true;
+
             return connection;
         }
 

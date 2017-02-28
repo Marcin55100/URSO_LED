@@ -96,7 +96,8 @@ namespace LED_Control
 
         private void GroupButton_Click(object sender, RoutedEventArgs e)
         {
-
+            ledControl = new LEDControl(Client);
+            this.Close();
         }
     }
 }

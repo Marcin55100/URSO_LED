@@ -14,6 +14,10 @@
         <StackPanel Name="addStack" DataContext="SelectionWindow" Grid.Column="0" Visibility="Visible">
             <StackPanel DataContext="LEDSegment">
                 <StackPanel Orientation="Horizontal">
+                    <Label Name="ConfigNameLabel" Content="Konfiguracja:" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <TextBox Margin="20,0,0,0"  Name="ConfigNameBox" Width="100"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
                     <Button Name="NewSegment" Content="DODAJ SEGMENT" HorizontalAlignment="Left" VerticalAlignment="Top" Click="NewSegment_Click" />
                 </StackPanel>
                 <Label Name="NameLabel" Content="Nazwa" HorizontalAlignment="Left" VerticalAlignment="Top" />
@@ -28,9 +32,11 @@
                     <Button x:Name="button" Content="Usuń" Width="50" Click="deleteButton" />
                 </StackPanel>
             </StackPanel>
-            <Button x:Name="startButton" Content="Rozpocznij" Margin="40,0,0,0" Width="100" HorizontalAlignment="Center" Click="startButton_Click"/>
+            <StackPanel Orientation="Horizontal" Height="50">
+                <Button x:Name="startButton" Content="Rozpocznij" VerticalAlignment="Center" HorizontalAlignment="Center" Click="startButton_Click"/>
+                <Button x:Name="saveButton" Content="Zapisz" VerticalAlignment="Center" HorizontalAlignment="Center" Click="saveButton_Click"/>
+            </StackPanel>
             
-            <Label Name="endLabel" Content=""  />
             <ListBox x:Name="fileBox" SelectionChanged="fileBox_SelectionChanged" Height="100"/>
         </StackPanel>
 
