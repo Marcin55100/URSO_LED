@@ -22,7 +22,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
-using NativeWifi;
 using System.IO;
 using System.Xml.Serialization;
 using System.Collections.ObjectModel;
@@ -38,61 +37,23 @@ namespace LED_Control
         LEDControl ledControl;
         TcpClient Client;
         ObservableCollection<LEDSegment> list;
-         String AdrressIP = "10.2.2.236";
-            String Port = "48569";
+
         public MainWindow()
         {
             InitializeComponent();
-            WlanClient wlan = new WlanClient();
             InitiateConnection();
             list = new ObservableCollection<LEDSegment>();
-            //this.IPBox.Text = "192.168.1.5";
-            //this.PortBox.Text = "48569";
-            //this.LEDon_Button.Visibility = System.Windows.Visibility.Hidden;
-            //this.LEDoff_Button.Visibility = System.Windows.Visibility.Hidden;
-            //WlanClient wlan = new WlanClient();
-            //string SSID = "";
-            //foreach (var item in wlan.Interfaces)
-            //{
-            //    SSID += " " + item.CurrentConnection.profileName;
-            //    //List<Wlan.WlanAvailableNetwork> networks = item.GetAvailableNetworkList(0).ToList();
-            //    //foreach (var network in networks)
-            //    //{
-            //    //    Console.WriteLine("SSID {0}", Encoding.ASCII.GetString(network.dot11Ssid.SSID, 0, (int)network.dot11Ssid.SSIDLength));
-            //    //}
-            //}
-            //this.Infolabel.Content = SSID;
-
         }
-        private void InitiateConnection()
+        public void InitiateConnection()
         {
             Client = new TcpClient();
-            IPAddress IP;
-            int port;
-            if (!Client.Connected)
-            {
-                if (IPAddress.TryParse(AdrressIP, out IP) && int.TryParse(Port, out port))
-                {
-                    try
-                    {
-                        Client.Connect(IP, port);
-                        Infolabel.Content = "Połączono";
-                    }
-                    catch (SocketException)
-                    {
-                        Infolabel.Content = "Serwer niedostępny";
-                    }
-                }
-                else Infolabel.Content = "Błędny format adresu IP lub portu";
-            }
-            else Infolabel.Content = "Połącznie wciąż aktywne";
+            if (ConnectionControl.ConnectBluegiga(Client)) Infolabel.Text = "Połączono";
+            else Infolabel.Text = "Serwer niedostępny";
         }
-
-    
 
         private void ConfigButton_Click(object sender, RoutedEventArgs e)
         {
-            configWindow = new ConfigWindow();
+            configWindow = new ConfigWindow(Client);
             this.Hide();
         }
         private void XmlFileToList(string filepath)
@@ -112,24 +73,16 @@ namespace LED_Control
 
         private void Load()
         {
-           // Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-           // dlg.DefaultExt = ".xml";
-          //  dlg.Filter = "XML documents (.xml)|*.xml";
+            var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            
 
-         //   Nullable<bool> result = dlg.ShowDialog();
-            string filepath = "C:\\Users\\Marcin\\Documents\\Visual Studio 2015\\Projects\\LED_Control\\LED_Control\\Save_configuration.xml";
-          //  if (result == true)
-           // {
-            //    filepath = dlg.FileName;
-
-            //}
-            if (File.Exists(filepath))
+            if (File.Exists(systemPath + @"\Segments.xml"))
             {
-                XmlFileToList(filepath);
+                XmlFileToList(systemPath + @"\Segments.xml");
             }
             else
             {
-                MessageBox.Show(@"chyba Ty'");
+                MessageBox.Show(@"Nie ma takiego pliku.");
             }
 
         }
@@ -138,6 +91,12 @@ namespace LED_Control
         {
             Load();
             ledControl = new LEDControl(Client, list.Count);
+            this.Close();
+        }
+
+        private void GroupButton_Click(object sender, RoutedEventArgs e)
+        {
+            ledControl = new LEDControl(Client);
             this.Close();
         }
     }

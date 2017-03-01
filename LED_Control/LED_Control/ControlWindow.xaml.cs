@@ -51,8 +51,6 @@ namespace LED_Control
                 newOFFBtn.Click += OFFbutton_Click;
                 mainPanel.Children.Add(newONBtn);
                 mainPanel.Children.Add(newOFFBtn);
-
-            
             }
 
         }
@@ -70,41 +68,43 @@ namespace LED_Control
 
         private void ONbutton_Click(object sender, RoutedEventArgs e)
         {
-           Button button = sender as Button;
-            if (Client.Connected)
-            {
-                NetworkStream Stream = Client.GetStream();
-                if (Stream.CanWrite)
-                {
-                    StringBuilder builder = new StringBuilder();
-                    builder.Append("LON").Append(0).Append(button.Name[8]);
-                    message = builder.ToString();
-                    byte[] Buffer = Encoding.ASCII.GetBytes(message);
-                    Stream.Write(Buffer, 0, Buffer.Length);
-                }
-            }
-            else Infolabel.Content = "Brak połączenia";
-
+            Button button = sender as Button;
+            SendPacket("LON", button.Name);
         }
 
         private void OFFbutton_Click(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button;
+            SendPacket("LOF", button.Name);
+        }
+        private void SendPacket(String Command, String Number)
+        {
             if (Client.Connected)
             {
                 NetworkStream Stream = Client.GetStream();
                 if (Stream.CanWrite)
                 {
-                    StringBuilder builder = new StringBuilder();
-                    builder.Append("LOF").Append(0).Append(button.Name[8]);
-                    message = builder.ToString();
-                    byte[] Buffer = Encoding.ASCII.GetBytes(message);
-                    Stream.Write(Buffer, 0, Buffer.Length);
+                    try
+                    {
+                        StringBuilder builder = new StringBuilder();
+                        builder.Append(Command).Append(0).Append(Number[8]);
+                        message = builder.ToString();
+                        byte[] Buffer = Encoding.ASCII.GetBytes(message);
+                        Stream.Write(Buffer, 0, Buffer.Length);
+                    }
+                    catch(SystemException)
+                    {
+                        MessageBox.Show("Połączenie przerwane.");
+                    }
                 }
             }
-            else Infolabel.Content = "Brak połączenia";
+           
+
 
 
         }
+
+
+
     }
 }

@@ -6,22 +6,42 @@
         xmlns:local="clr-namespace:LED_Control"
         mc:Ignorable="d"
         Title="Menu" Height="350" Width="525">
-    <Grid>
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-            <StackPanel.Resources>
-                <Style TargetType="{x:Type Button}">
-                    <Setter Property="Margin" Value="0,10,0,0"/>
-                </Style>
-            </StackPanel.Resources>
-            <StackPanel Width="100" Height="100">
-            <Button x:Name="LedButton" Content="LED" Click="LedButton_Click" />
-            <Button x:Name="ConfigButton" Content="Konfiguracja" Click="ConfigButton_Click" />
+    <Grid >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+       
+        <Grid Grid.Column="1" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Button x:Name="LedButton" Grid.Row="0"  Content="Sterowanie LED" Click="LedButton_Click" />
+            <Button x:Name="GroupButton"  Grid.Row="1"  Content="Ustawienia portów" Click="GroupButton_Click" />
+            <Button x:Name="ConfigButton"  Grid.Row="2"  Content="Konfiguracja połączenia" Click="ConfigButton_Click" />
+            <!--<Label x:Name="Infolabel" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Row="3" Content="cos" /> -->
+            <Viewbox Stretch="Uniform" Grid.Row="3">
+                <TextBlock Name="Infolabel" Text="Test" />
+            </Viewbox>
+        </Grid>
+        <!--
+        <DockPanel VerticalAlignment="Stretch" Grid.Row="1" Grid.Column="1" Height="Auto">
+            <Button x:Name="LedButton" DockPanel.Dock="Top" Content="Sterowanie LED" Click="LedButton_Click" />
+            <Button x:Name="GroupButton" DockPanel.Dock="Top" Content="Ustawienia portów" Click="GroupButton_Click" />
+            <Button x:Name="ConfigButton" DockPanel.Dock="Top" Content="Konfiguracja połączenia" Click="ConfigButton_Click" />
             <Label x:Name="Infolabel" Content="cos" />
-        </StackPanel>
-        
-            
-        
+             
+        </DockPanel>
+        -->
 
-        </StackPanel>
     </Grid>
 </Window>

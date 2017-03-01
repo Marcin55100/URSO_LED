@@ -16,6 +16,7 @@ using System.Collections.ObjectModel;
 using System.Timers;
 using System.IO;
 using System.Xml.Serialization;
+using System.Collections;
 
 namespace LED_Control
 {
@@ -54,10 +55,9 @@ namespace LED_Control
         {
             this.mainStack.Visibility = System.Windows.Visibility.Hidden;
             this.NameLabel.Visibility = System.Windows.Visibility.Hidden;
-            this.NameBox.Visibility = System.Windows.Visibility.Hidden;
-            this.endLabel.Visibility = System.Windows.Visibility.Hidden;
+            this.NameBox.Visibility = System.Windows.Visibility.Hidden;    
         }
-        private void Start()
+        private void Start() // Licznik jest po to, aby można było wstawić migającą diodkę do widoku. Jeszcze nie rozkminione.
         {
             _timer = new Timer(1000);
             _timer.Elapsed += new ElapsedEventHandler(_timer_Elapsed);
@@ -98,6 +98,7 @@ namespace LED_Control
 
         private void XmlFileToList(string filepath)
         {
+            list.Clear();
             using (var sr = new StreamReader(filepath))
             {
                 var deserializer = new XmlSerializer(typeof(ObservableCollection<LEDSegment>));
@@ -113,24 +114,25 @@ namespace LED_Control
 
         private void Load()
         {
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.DefaultExt = ".xml";
-            dlg.Filter = "XML documents (.xml)|*.xml";
-
-            Nullable<bool> result = dlg.ShowDialog();
-            string filepath = "";
-            if (result == true)
+            var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            // string[] filePaths = Directory.GetFiles(systemPath);
+            fileBox.Items.Clear();
+            foreach (var file in Directory.EnumerateFiles(systemPath, "*.xml"))
             {
-                filepath = dlg.FileName;
-
+                string fileName_ = file.ToString().Replace(systemPath.ToString()+"\\","");
+                ListBoxItem fileName = new ListBoxItem();
+                fileName.Content = fileName_;
+                fileBox.Items.Add(fileName);
             }
-            if (File.Exists(filepath))
+           // filePaths =Array.FindAll(filePaths,s =>s.Contains("xml"));
+
+            try
             {
-                XmlFileToList(filepath);
+                XmlFileToList(systemPath + @"\Segments.xml");
             }
-            else
+            catch(FileNotFoundException)
             {
-                MessageBox.Show(@"chyba Ty'");
+
             }
 
         }
@@ -138,18 +140,8 @@ namespace LED_Control
 
         private void startButton_Click(object sender, RoutedEventArgs e)
         {
-            // endLabel.Content = "koniec";
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.FileName = "Characters"; //Default file name
-            dlg.DefaultExt = ".xml";
-            dlg.Filter = "XML documents (.xml)|*.xml";
-            Nullable<bool> result = dlg.ShowDialog();
-
-            if (result == true)
-            {
-                string filePath = dlg.FileName;
-                ListToXmlFile(filePath);
-            }
+            var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);     
+            ListToXmlFile(systemPath + @"\Segments.xml");
             _timer.Enabled = false;
             ledControl = new LEDControl(Client, list.Count);
             this.Close();
@@ -186,6 +178,21 @@ namespace LED_Control
             this.NameLabel.Visibility = System.Windows.Visibility.Visible;
             this.NameBox.Visibility = System.Windows.Visibility.Visible;
             _timer.Enabled = true;
+        }
+
+        private void fileBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            ListBoxItem selectedNetwork = new ListBoxItem();
+            selectedNetwork = (ListBoxItem)fileBox.SelectedItem;
+            XmlFileToList(systemPath + "\\" + selectedNetwork.Content);
+        }
+
+        private void saveButton_Click(object sender, RoutedEventArgs e)
+        {
+             var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);     
+             ListToXmlFile(systemPath +"\\"+ConfigNameBox.Text+".xml");
+             Load();
         }
     }
 }

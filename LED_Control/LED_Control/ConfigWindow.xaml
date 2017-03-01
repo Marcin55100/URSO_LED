@@ -7,12 +7,22 @@
         mc:Ignorable="d"
         Title="Konfiguracja sieci" Height="350" Width="525">
     <Grid>
-        <TextBox x:Name="IPBox" HorizontalAlignment="Left" Height="23" Margin="68,135,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
-        <Button x:Name="Connect_button" Content="Połącz" HorizontalAlignment="Left" Margin="315,135,0,0" VerticalAlignment="Top" Width="75" Click="Connect_button_Click"/>
-        <Label x:Name="Infolabel" Content="Label" HorizontalAlignment="Left" Margin="68,196,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="PortBox" HorizontalAlignment="Left" Height="23" Margin="224,134,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="63"/>
-        <Label x:Name="IPlabel" Content="IP:" HorizontalAlignment="Left" Margin="68,86,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="Portlabel" Content="Port:" HorizontalAlignment="Left" Margin="224,86,0,0" VerticalAlignment="Top"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
+        <ListBox x:Name="listBox" Grid.Column="0" SelectionChanged="listBox_SelectionChanged" HorizontalAlignment="Left" Height="230" Margin="10,10,0,0" VerticalAlignment="Top" Width="211"/>
+        <Button x:Name="refreshButton" Content="Odśwież" HorizontalAlignment="Left" Margin="80,259,0,0" VerticalAlignment="Top" Width="75" Click="refreshButton_Click"/>
+        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+            <TextBox x:Name="passwordBox" HorizontalAlignment="Left" Height="23"  TextWrapping="Wrap" Text="Podaj hasło..." VerticalAlignment="Top" Width="120"/>
+            <Button x:Name="ConnectButton" Content="Połącz" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="75" Click="ConnectButton_Click"/>
+            <Label x:Name="Infolabel" Content="Brak połączenia"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" VerticalAlignment="Bottom" Height="23" Orientation="Horizontal" >
+            <Button x:Name="backButton" Content="Gotowe"   Width="74" Click="backButton_Click" Height="23" VerticalAlignment="Top"/>
+            <Button x:Name="nextButton" Content="Dalej"  Margin="40,0,0,0" Width="74" Click="nextButton_Click"/>
+            
+        </StackPanel>
     </Grid>
 </Window>
