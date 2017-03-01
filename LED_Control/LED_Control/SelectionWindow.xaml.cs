@@ -120,6 +120,7 @@ namespace LED_Control
             foreach (var file in Directory.EnumerateFiles(systemPath, "*.xml"))
             {
                 string fileName_ = file.ToString().Replace(systemPath.ToString()+"\\","");
+                fileName_=fileName_.Replace(".xml", "");
                 ListBoxItem fileName = new ListBoxItem();
                 fileName.Content = fileName_;
                 fileBox.Items.Add(fileName);
@@ -170,9 +171,6 @@ namespace LED_Control
                 byte[] Buffer = Encoding.ASCII.GetBytes(message);
                         Stream.Write(Buffer, 0, Buffer.Length);
                     }
-               
-               
-
             Segment = new LEDSegment();
             this.mainStack.Visibility = System.Windows.Visibility.Visible;
             this.NameLabel.Visibility = System.Windows.Visibility.Visible;
@@ -185,14 +183,22 @@ namespace LED_Control
             var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             ListBoxItem selectedNetwork = new ListBoxItem();
             selectedNetwork = (ListBoxItem)fileBox.SelectedItem;
-            XmlFileToList(systemPath + "\\" + selectedNetwork.Content);
+            XmlFileToList(systemPath + "\\" + selectedNetwork.Content+".xml");
         }
 
-        private void saveButton_Click(object sender, RoutedEventArgs e)
+        private void saveConfigButton_Click(object sender, RoutedEventArgs e)
         {
              var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);     
              ListToXmlFile(systemPath +"\\"+ConfigNameBox.Text+".xml");
              Load();
+        }
+
+        private void deleteConfigButton_Click(object sender, RoutedEventArgs e)
+        {
+            var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            ListBoxItem selectedNetwork = new ListBoxItem();
+            selectedNetwork = (ListBoxItem)fileBox.SelectedItem;
+
         }
     }
 }

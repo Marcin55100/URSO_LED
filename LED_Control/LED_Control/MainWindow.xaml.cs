@@ -96,8 +96,13 @@ namespace LED_Control
 
         private void GroupButton_Click(object sender, RoutedEventArgs e)
         {
-            ledControl = new LEDControl(Client);
-            this.Close();
+            if (Client.Connected)
+            {
+                ledControl = new LEDControl(Client);
+                this.Close();
+            }
+            else
+            MessageBox.Show(@"Najpierw skonfiguruj połączenie.");
         }
     }
 }
