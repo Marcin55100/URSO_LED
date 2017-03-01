@@ -12,6 +12,8 @@ namespace LED_Control
 {
     class ConnectionControl
     {
+        const string defaultAP = "Bluegiga";
+        const string defaultPW = "bluegiga";
         const int port = 54069;
 
         public static bool ConnectBluegiga(TcpClient tcp)
@@ -24,23 +26,66 @@ namespace LED_Control
             {
                 if (!wifi.NoWifiAvailable)
                 {
-                    //próba połączenia z BG w sieci, do której urządzenie jest podłączone
-                    if (wifi.ConnectionStatus == WifiStatus.Connected)
+                    if (ReadMemory(out IP, out ssid))
                     {
-                        tcp = CreateTCPConnection(UDPListener(), port, tcp);
-                        if (tcp.Connected) connection = true;
-                    }
-                    //sprawdzenie czy aplikacja ma w pamięci parametry połączenia
-                    if (!connection && ReadMemory(out IP, out ssid))
-                    {
-                        //próba połącznia z BG w sieci z pamięci aplikacji (jeśli sieć znajduje się na liście dostępnych AP)
-                        if (!connection && wifi.GetAccessPoints().Exists(item => item.Name == ssid))
+                        if (wifi.ConnectionStatus == WifiStatus.Connected)
                         {
-                            ConnectNetwork(wifi, ssid);
-                            if (wifi.ConnectionStatus == WifiStatus.Connected)
+                            if (wifi.GetAccessPoints().Find(item => item.IsConnected).Name == ssid)
                             {
                                 tcp = CreateTCPConnection(IP, port, tcp);
                                 if (tcp.Connected) connection = true;
+                            }
+                            else if (wifi.GetAccessPoints().Exists(item => item.Name == ssid))
+                            {
+                                ConnectNetwork(wifi, ssid);
+                                if (wifi.ConnectionStatus == WifiStatus.Connected)
+                                {
+                                    if (wifi.GetAccessPoints().Find(item => item.IsConnected).Name == ssid)
+                                    {
+                                        tcp = CreateTCPConnection(IP, port, tcp);
+                                        if (tcp.Connected) connection = true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                tcp = CreateTCPConnection(IPAddress.Any, port, tcp);
+                                if (tcp.Connected) connection = true;
+                            }
+                        }
+                    }
+                    else if (wifi.ConnectionStatus == WifiStatus.Connected)
+                    {
+                        tcp = CreateTCPConnection(IPAddress.Any, port, tcp);
+                        if (tcp.Connected) connection = true;
+                        else
+                        {
+                            if (wifi.GetAccessPoints().Exists(item => item.Name == defaultAP))
+                            {
+                                ConnectNetwork(wifi, defaultAP, defaultPW);
+                                if (wifi.ConnectionStatus == WifiStatus.Connected)
+                                {
+                                    if (wifi.GetAccessPoints().Find(item => item.IsConnected).Name == defaultAP)
+                                    {
+                                        tcp = CreateTCPConnection(IPAddress.Any, port, tcp);
+                                        if (tcp.Connected) connection = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else if (wifi.ConnectionStatus == WifiStatus.Disconnected)
+                    {
+                        if (wifi.GetAccessPoints().Exists(item => item.Name == defaultAP))
+                        {
+                            ConnectNetwork(wifi, defaultAP, defaultPW);
+                            if (wifi.ConnectionStatus == WifiStatus.Connected)
+                            {
+                                if (wifi.GetAccessPoints().Find(item => item.IsConnected).Name == defaultAP)
+                                {
+                                    tcp = CreateTCPConnection(IPAddress.Any, port, tcp);
+                                    if (tcp.Connected) connection = true;
+                                }
                             }
                         }
                     }
@@ -93,7 +138,7 @@ namespace LED_Control
                 try
                 {
                     IP = UDPListener();
-                    tcp.Connect(IP, port);
+                    tcp.Connect(IP, port);  //nie łączyć jak UDP nic nie znajdzie!
                 }
                 catch (Exception) { }
             }
