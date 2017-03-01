@@ -12,7 +12,7 @@ namespace LED_Control
 {
     class ConnectionControl
     {
-        const int port = 23;
+        const int port = 54069;
 
         public static bool ConnectBluegiga(TcpClient tcp)
         {
@@ -47,8 +47,7 @@ namespace LED_Control
                     if (connection) SaveMemory(((IPEndPoint)tcp.Client.RemoteEndPoint).Address, wifi.GetAccessPoints().Find(item => item.IsConnected).Name);
                 }
             }
-            else
-                connection = true;
+            else connection = true;
 
             return connection;
         }
