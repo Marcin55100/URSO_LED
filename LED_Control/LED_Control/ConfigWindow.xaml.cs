@@ -27,17 +27,15 @@ namespace LED_Control
     /// </summary>
     public partial class ConfigWindow : Window
     {
-        private const int listenPort = 11000;
         public TcpClient Client;
-        public static String ServerIP;
-        public static String Message;
-        public String [] IPInfo;
         public ListBoxItem lastNetwork;
         Wifi wifi;
+
         public ConfigWindow(TcpClient Client)
         {
             Show();
             InitializeComponent();
+            passwordLabel.Visibility = Visibility.Hidden;
             passwordBox.Visibility = Visibility.Hidden;
             ConnectButton.Visibility = Visibility.Hidden;
             this.Client = Client;
@@ -61,7 +59,6 @@ namespace LED_Control
                         network.FontWeight = FontWeights.Bold;
                         lastNetwork = network;
                     }
-
                     listBox.Items.Add(network);
                 }
             }
@@ -84,10 +81,11 @@ namespace LED_Control
                 string password = "";
                 if (!wifi.GetAccessPoints().Find(item => item.Name == network.Content.ToString()).HasProfile)
                 {
-                    password = passwordBox.Text;
+                    password = passwordBox.Password;
                 }
                 ConnectionControl.ConnectNetwork(wifi, network.Content.ToString(), password);
-                if (ConnectionControl.ConnectBluegiga(Client) == true)
+                ConnectionControl.SaveMemory(IPAddress.Any, network.Content.ToString());
+                if (ConnectionControl.ConnectBluegiga(Client))
                 {
                     MessageBoxResult result = MessageBox.Show("Połączono. Czy chcesz skonfigurować porty?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
                     if(result== MessageBoxResult.Yes)
@@ -108,13 +106,15 @@ namespace LED_Control
                 selectedNetwork = (ListBoxItem)listBox.SelectedItem;
                 if (selectedNetwork.FontWeight == FontWeights.Bold)
                 {
-                    passwordBox.Visibility = System.Windows.Visibility.Hidden;
-                    ConnectButton.Visibility = System.Windows.Visibility.Hidden;
+                    passwordLabel.Visibility = Visibility.Hidden;
+                    passwordBox.Visibility = Visibility.Hidden;
+                    ConnectButton.Visibility = Visibility.Hidden;
                 }
                 else
                 {
-                    passwordBox.Visibility = System.Windows.Visibility.Visible;
-                    ConnectButton.Visibility = System.Windows.Visibility.Visible;
+                    passwordLabel.Visibility = Visibility.Visible;
+                    passwordBox.Visibility = Visibility.Visible;
+                    ConnectButton.Visibility = Visibility.Visible;
                 }
             }
             catch(NullReferenceException)

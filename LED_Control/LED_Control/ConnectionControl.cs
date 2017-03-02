@@ -140,7 +140,7 @@ namespace LED_Control
             return memory;
         }
 
-        private static void SaveMemory(IPAddress IP, string ssid)
+        public static void SaveMemory(IPAddress IP, string ssid)
         {
             var systemPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             using (StreamWriter outputFile = new StreamWriter(systemPath + @"\ConnectionInfo.txt"))
