@@ -175,9 +175,7 @@ namespace LED_Control
 
         public static void ConnectNetwork(Wifi wifi, string ssid, string password = "")
         {
-            if (wifi.NoWifiAvailable) ;
-
-            else
+            if (!wifi.NoWifiAvailable)
             {
                 var accessPoint = wifi.GetAccessPoints().Find(item => item.Name == ssid);
                 AuthRequest authRequest = new AuthRequest(accessPoint);
@@ -189,20 +187,6 @@ namespace LED_Control
                 }
                 accessPoint.Connect(authRequest, overwrite);
             }
-        }
-
-        public static List<string> GetWifiNetworks()
-        {
-            List<string> networks = new List<string>();
-            Wifi wifi = new Wifi();
-            if (!wifi.NoWifiAvailable)
-            {
-                foreach (var accessPoint in wifi.GetAccessPoints())
-                {
-                    networks.Add(accessPoint.Name);
-                }
-            }
-            return networks;
         }
     }
 }

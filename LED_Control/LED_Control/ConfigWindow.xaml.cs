@@ -43,16 +43,13 @@ namespace LED_Control
         {
             Show();
             InitializeComponent();
-            passwordBox.Visibility = System.Windows.Visibility.Hidden;
-            ConnectButton.Visibility = System.Windows.Visibility.Hidden;
+            passwordBox.Visibility = Visibility.Hidden;
+            ConnectButton.Visibility = Visibility.Hidden;
             this.Client = Client;
 
             wifi = new Wifi();
             WifiSearch(wifi);
-            if (ConnectionControl.ConnectBluegiga(Client) == true) Infolabel.Content = "Połączono";
-
-            //StartListener();
-            //Connect_();
+            if (Client.Connected) Infolabel.Content = "Połączono";
         }
 
         private void WifiSearch(Wifi wifi)
@@ -73,87 +70,8 @@ namespace LED_Control
                     listBox.Items.Add(network);
                 }
             }
-
         }
-
-        private void StartListener()
-        {
-            bool done = false;
-
-            UdpClient listener = new UdpClient(listenPort);
-            IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, listenPort);
-            IPEndPoint bluegiga = new IPEndPoint(IPAddress.Broadcast, 23);
-            listener.Send(new byte[] { 1, 2, 3, 4, 5 }, 5, bluegiga);
-            try
-            {
-               
-                while (!done)
-                {
-                    Console.WriteLine("Waiting for broadcast");
-                    byte[] bytes = listener.Receive(ref groupEP);
-
-                    Console.WriteLine("Received broadcast from {0} :\n {1}\n",
-                        groupEP.ToString(),
-                        Encoding.ASCII.GetString(bytes, 0, bytes.Length));
-                    Message = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
-
-                    if (Message=="HELLO")
-                    {
-                        ServerIP = groupEP.ToString();
-                        IPInfo = ServerIP.Split(':');
-                        WriteToFile(IPInfo);
-                        done = true;
-                    }
-                }
-
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-            finally
-            {
-                listener.Close();
-            }
-        }
-
-        private void WriteToFile(String [] IP)
-        {
-            string[] lines = {IP[0], IP[1]};
-            
-               var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-
-            using (StreamWriter outputFile = new StreamWriter(systemPath + @"\ConnectionInfo.txt"))
-            {
-                foreach (string line in lines)
-                    outputFile.WriteLine(line);
-            }
-        }
-
-        private void Connect_()
-        {
-            Client = new TcpClient();
-            IPAddress IP;
-            int port;
-            if (!Client.Connected)
-            {
-                if (IPAddress.TryParse(IPInfo[0], out IP) && int.TryParse(IPInfo[1], out port))
-                {
-                    try
-                    {
-                        Client.Connect(IP, port);
-                        Infolabel.Content = "Połączono";
-                    }
-                    catch (SocketException)
-                    {
-                        Infolabel.Content = "Serwer niedostępny";
-                    }
-                }
-                else Infolabel.Content = "Błędny format adresu IP lub portu";
-            }
-            else Infolabel.Content = "Połącznie wciąż aktywne";
-        }
-
+        
         private void nextButton_Click(object sender, RoutedEventArgs e)
         {
             LEDControl LED = new LEDControl(Client);
@@ -185,7 +103,6 @@ namespace LED_Control
                     Infolabel.Content = "Połączono";
                 }
                 WifiSearch(wifi);
-
             }
         }
 
