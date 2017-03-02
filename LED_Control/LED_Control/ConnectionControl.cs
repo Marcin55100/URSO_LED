@@ -19,13 +19,21 @@ namespace LED_Control
         public static bool ConnectBluegiga(TcpClient tcp)
         {
             bool connection = false;
+            bool networksAvailable = false;
             Wifi wifi = new Wifi();
-            IPAddress IP;
-            string ssid;
-            if (tcp.Connected == false)
+
+            try
             {
-                if (!wifi.NoWifiAvailable)
+                networksAvailable = wifi.GetAccessPoints().Any();
+            }
+            catch { }
+
+            if (!tcp.Connected)
+            {
+                if (!wifi.NoWifiAvailable && networksAvailable)
                 {
+                    IPAddress IP;
+                    string ssid;
                     if (ReadMemory(out IP, out ssid))
                     {
                         if (wifi.ConnectionStatus == WifiStatus.Connected)
@@ -51,6 +59,21 @@ namespace LED_Control
                             {
                                 tcp = CreateTCPConnection(IPAddress.Any, port, tcp);
                                 if (tcp.Connected) connection = true;
+                            }
+                        }
+                        else if (wifi.ConnectionStatus == WifiStatus.Disconnected)
+                        {
+                            if (wifi.GetAccessPoints().Exists(item => item.Name == ssid))
+                            {
+                                ConnectNetwork(wifi, ssid);
+                                if (wifi.ConnectionStatus == WifiStatus.Connected)
+                                {
+                                    if (wifi.GetAccessPoints().Find(item => item.IsConnected).Name == ssid)
+                                    {
+                                        tcp = CreateTCPConnection(IP, port, tcp);
+                                        if (tcp.Connected) connection = true;
+                                    }
+                                }
                             }
                         }
                     }
@@ -89,10 +112,10 @@ namespace LED_Control
                             }
                         }
                     }
-                    if (connection) SaveMemory(((IPEndPoint)tcp.Client.RemoteEndPoint).Address, wifi.GetAccessPoints().Find(item => item.IsConnected).Name);
                 }
             }
             else connection = true;
+            if (connection) SaveMemory(((IPEndPoint)tcp.Client.RemoteEndPoint).Address, wifi.GetAccessPoints().Find(item => item.IsConnected).Name);
 
             return connection;
         }
@@ -138,7 +161,7 @@ namespace LED_Control
                 try
                 {
                     IP = UDPListener();
-                    tcp.Connect(IP, port);  //nie łączyć jak UDP nic nie znajdzie!
+                    tcp.Connect(IP, port);
                 }
                 catch (Exception) { }
             }
