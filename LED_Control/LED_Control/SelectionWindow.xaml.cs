@@ -180,10 +180,10 @@ namespace LED_Control
 
         private void fileBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            ListBoxItem selectedNetwork = new ListBoxItem();
-            selectedNetwork = (ListBoxItem)fileBox.SelectedItem;
-            XmlFileToList(systemPath + "\\" + selectedNetwork.Content+".xml");
+                var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+                ListBoxItem selectedNetwork = new ListBoxItem();
+                selectedNetwork = (ListBoxItem)fileBox.SelectedItem;
+                XmlFileToList(systemPath + "\\" + selectedNetwork.Content + ".xml");
         }
 
         private void saveConfigButton_Click(object sender, RoutedEventArgs e)
@@ -198,6 +198,19 @@ namespace LED_Control
             var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             ListBoxItem selectedNetwork = new ListBoxItem();
             selectedNetwork = (ListBoxItem)fileBox.SelectedItem;
+
+            System.IO.DirectoryInfo di = new DirectoryInfo(systemPath);
+            foreach (FileInfo file in di.GetFiles())
+            {
+                if(file.Name == (selectedNetwork.Content.ToString()+".xml"))
+                {
+                    file.Delete();
+                    fileBox.Items.Remove(selectedNetwork);
+                    fileBox.SelectedIndex = 0;
+                }
+            }
+
+
 
         }
     }
