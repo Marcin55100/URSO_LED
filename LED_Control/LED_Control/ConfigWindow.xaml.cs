@@ -17,7 +17,9 @@ using System.Data;
 using System.Drawing;
 using System.Net;
 using System.Net.Sockets;
+using System.Net.NetworkInformation;
 using SimpleWifi;
+using NativeWifi;
 using System.IO;
 
 namespace LED_Control
@@ -35,14 +37,19 @@ namespace LED_Control
         {
             Show();
             InitializeComponent();
-            passwordLabel.Visibility = Visibility.Hidden;
-            passwordBox.Visibility = Visibility.Hidden;
-            ConnectButton.Visibility = Visibility.Hidden;
             this.Client = Client;
 
             wifi = new Wifi();
+            wifi.ConnectionStatusChanged += wifi_ConnectionStatusChanged;
             WifiSearch(wifi);
-            if (Client.Connected) Infolabel.Content = "Połączono";
+            if (Client.Connected) infoLabel.Content = "Połączono ze sterownikiem";
+            else infoLabel.Content = "Sterownik niedostępny";
+        }
+
+        private void wifi_ConnectionStatusChanged(object sender, WifiStatusEventArgs e)
+        {
+            //WifiSearch(wifi);
+            //automatyczne odświeżanie listy sieci
         }
 
         private void WifiSearch(Wifi wifi)
@@ -60,6 +67,7 @@ namespace LED_Control
                         lastNetwork = network;
                     }
                     listBox.Items.Add(network);
+                    var test = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault();
                 }
             }
         }
@@ -72,28 +80,33 @@ namespace LED_Control
 
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
-            //int index=listBox.Items.IndexOf(lastNetwork);
             lastNetwork.FontWeight = FontWeights.Regular;
-            // listBox.Items[index]
             if (listBox.SelectedItem != null)
             {
                 ListBoxItem network = listBox.SelectedItem as ListBoxItem;
                 string password = "";
-                if (!wifi.GetAccessPoints().Find(item => item.Name == network.Content.ToString()).HasProfile)
+                if (wifi.GetAccessPoints().Find(item => item.Name == network.Content.ToString()).IsSecure)
                 {
                     password = passwordBox.Password;
                 }
                 ConnectionControl.ConnectNetwork(wifi, network.Content.ToString(), password);
-                ConnectionControl.SaveMemory(IPAddress.Any, network.Content.ToString());
-                if (ConnectionControl.ConnectBluegiga(Client))
+                if (wifi.ConnectionStatus == WifiStatus.Connected)
                 {
-                    MessageBoxResult result = MessageBox.Show("Połączono. Czy chcesz skonfigurować porty?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if(result== MessageBoxResult.Yes)
+                    if (wifi.GetAccessPoints().Find(item => item.IsConnected).Name == network.Content.ToString())
                     {
-                        LEDControl LED = new LEDControl(Client);
-                        this.Close();
+                        ConnectionControl.DeleteMemory();
+                        if (ConnectionControl.ConnectBluegiga(Client))
+                        {
+                            MessageBoxResult result = MessageBox.Show("Połączono. Czy chcesz skonfigurować porty?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                            if (result == MessageBoxResult.Yes)
+                            {
+                                LEDControl LED = new LEDControl(Client);
+                                this.Close();
+                            }
+                            infoLabel.Content = "Połączono";
+                        }
+                        else infoLabel.Content = "Brak połączenia";
                     }
-                    Infolabel.Content = "Połączono";
                 }
                 WifiSearch(wifi);
             }
@@ -106,15 +119,11 @@ namespace LED_Control
                 selectedNetwork = (ListBoxItem)listBox.SelectedItem;
                 if (selectedNetwork.FontWeight == FontWeights.Bold)
                 {
-                    passwordLabel.Visibility = Visibility.Hidden;
-                    passwordBox.Visibility = Visibility.Hidden;
-                    ConnectButton.Visibility = Visibility.Hidden;
+                    networkPanel.Visibility = Visibility.Hidden;
                 }
                 else
                 {
-                    passwordLabel.Visibility = Visibility.Visible;
-                    passwordBox.Visibility = Visibility.Visible;
-                    ConnectButton.Visibility = Visibility.Visible;
+                    networkPanel.Visibility = Visibility.Visible;
                 }
             }
             catch(NullReferenceException)
@@ -128,6 +137,19 @@ namespace LED_Control
 
         private void backButton_Click(object sender, RoutedEventArgs e)
         {
+        }
+
+        private void changeButton_Click(object sender, RoutedEventArgs e)
+        {
+            //WlanClient wlan = new WlanClient();
+            //var wlanInterface = wlan.Interfaces.ToList().Find(item => item.InterfaceState == Wlan.WlanInterfaceState.Connected);
+            //var bssid = wlanInterface.GetNetworkBssList();
+            string bssid = "";
+            byte[] message = Encoding.ASCII.GetBytes(bssid);
+            Stream stream = Client.GetStream();
+            stream.Write(message, 0, message.Length);
+            message = Encoding.ASCII.GetBytes("NETPW" + passwordBox.Password);
+            stream.Write(message, 0, message.Length);
         }
     }
 }

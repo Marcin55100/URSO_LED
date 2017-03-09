@@ -14,11 +14,12 @@
 
         <ListBox x:Name="listBox" Grid.Column="0" SelectionChanged="listBox_SelectionChanged" HorizontalAlignment="Left" Height="230" Margin="10,10,0,0" VerticalAlignment="Top" Width="211"/>
         <Button x:Name="refreshButton" Content="Odśwież" HorizontalAlignment="Left" Margin="80,259,0,0" VerticalAlignment="Top" Width="75" Click="refreshButton_Click"/>
-        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+        <StackPanel x:Name="networkPanel" VerticalAlignment="Center" Margin="248,10,10,191" Grid.ColumnSpan="2" Visibility="Hidden">
             <Label x:Name="passwordLabel" Content="Podaj hasło:"/>
             <PasswordBox x:Name="passwordBox" PasswordChar="*" HorizontalAlignment="Left" Height="23" VerticalAlignment="Top" Width="120"/>
-            <Button x:Name="ConnectButton" Content="Połącz" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="75" Click="ConnectButton_Click"/>
-            <Label x:Name="Infolabel" Content="Brak połączenia"/>
+            <Button x:Name="connectButton" Content="Połącz" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="75" Click="ConnectButton_Click"/>
+            <Button x:Name="changeButton" Content="Przełącz sieć" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="changeButton_Click"/>
+            <Label x:Name="infoLabel" Content="Łączę ze sterownikiem..."/>
         </StackPanel>
         <StackPanel Grid.Column="1" VerticalAlignment="Bottom" Height="23" Orientation="Horizontal" >
             <Button x:Name="backButton" Content="Gotowe"   Width="74" Click="backButton_Click" Height="23" VerticalAlignment="Top"/>

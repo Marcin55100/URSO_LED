@@ -14,6 +14,7 @@ namespace LED_Control
     {
         const string defaultAP = "Bluegiga";
         const string defaultPW = "bluegiga";
+        const string memoryFile = @"\ConnectionInfo.txt";
         const int port = 54069;
 
         public static bool ConnectBluegiga(TcpClient tcp)
@@ -126,7 +127,7 @@ namespace LED_Control
             var systemPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             try
             {
-                StreamReader file = new StreamReader(systemPath + @"\ConnectionInfo.txt");
+                StreamReader file = new StreamReader(systemPath + memoryFile);
                 memory = IPAddress.TryParse(file.ReadLine(), out IP);
                 ssid = file.ReadLine();
                 file.Close();
@@ -143,11 +144,17 @@ namespace LED_Control
         public static void SaveMemory(IPAddress IP, string ssid)
         {
             var systemPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            using (StreamWriter outputFile = new StreamWriter(systemPath + @"\ConnectionInfo.txt"))
+            using (StreamWriter outputFile = new StreamWriter(systemPath + memoryFile))
             {
                 outputFile.WriteLine(IP.ToString());
                 outputFile.WriteLine(ssid);
             }
+        }
+
+        public static void DeleteMemory()
+        {
+            var systemPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            if (File.Exists(systemPath + memoryFile)) File.Delete(systemPath + memoryFile);
         }
 
         private static TcpClient CreateTCPConnection(IPAddress IP, int port, TcpClient tcp)
