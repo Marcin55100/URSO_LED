@@ -21,7 +21,6 @@ C:\Users\Marcin\Documents\Visual Studio 2015\Projects\LED_Control\LED_Control\ob
 C:\Users\Marcin\Documents\GitHub\URSO_LED\LED_Control\LED_Control\bin\Debug\LED_Control.exe.config
 C:\Users\Marcin\Documents\GitHub\URSO_LED\LED_Control\LED_Control\obj\Debug\LED_Control.exe
 C:\Users\Marcin\Documents\GitHub\URSO_LED\LED_Control\LED_Control\obj\Debug\LED_Control.pdb
-C:\Users\Marcin\Documents\GitHub\URSO_LED\LED_Control\LED_Control\obj\Debug\LED_Control.csprojResolveAssemblyReference.cache
 C:\Users\Marcin\Documents\GitHub\URSO_LED\LED_Control\LED_Control\obj\Debug\ConfigWindow.g.cs
 C:\Users\Marcin\Documents\GitHub\URSO_LED\LED_Control\LED_Control\obj\Debug\ControlWindow.g.cs
 C:\Users\Marcin\Documents\GitHub\URSO_LED\LED_Control\LED_Control\obj\Debug\MainWindow.g.cs

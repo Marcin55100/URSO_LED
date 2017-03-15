@@ -183,7 +183,15 @@ namespace LED_Control
                 var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
                 ListBoxItem selectedNetwork = new ListBoxItem();
                 selectedNetwork = (ListBoxItem)fileBox.SelectedItem;
+            try
+            {
                 XmlFileToList(systemPath + "\\" + selectedNetwork.Content + ".xml");
+            }
+            catch(NullReferenceException)
+                {
+
+
+                }
         }
 
         private void saveConfigButton_Click(object sender, RoutedEventArgs e)
@@ -205,8 +213,9 @@ namespace LED_Control
                 if(file.Name == (selectedNetwork.Content.ToString()+".xml"))
                 {
                     file.Delete();
-                    fileBox.Items.Remove(selectedNetwork);
                     fileBox.SelectedIndex = 0;
+                    fileBox.Items.Remove(selectedNetwork);
+                    
                 }
             }
 
