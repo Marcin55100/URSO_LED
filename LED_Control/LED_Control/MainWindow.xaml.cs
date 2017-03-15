@@ -12,14 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using System.IO;
@@ -41,14 +36,19 @@ namespace LED_Control
         public MainWindow()
         {
             InitializeComponent();
-            InitiateConnection();
             list = new ObservableCollection<LEDSegment>();
         }
-        public void InitiateConnection()
+
+        private void Window_ContentRendered(object sender, EventArgs e)
         {
             Client = new TcpClient();
-            if (ConnectionControl.ConnectBluegiga(Client)) Infolabel.Text = "Połączono";
-            else Infolabel.Text = "Serwer niedostępny";
+            if (ConnectionControl.ConnectBluegiga(Client)) Infolabel.Text = "Połączono ze sterownikiem";
+            else Infolabel.Text = "Sterownik niedostępny";
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            
         }
 
         private void ConfigButton_Click(object sender, RoutedEventArgs e)
@@ -56,6 +56,7 @@ namespace LED_Control
             configWindow = new ConfigWindow(Client);
             this.Hide();
         }
+
         private void XmlFileToList(string filepath)
         {
             using (var sr = new StreamReader(filepath))

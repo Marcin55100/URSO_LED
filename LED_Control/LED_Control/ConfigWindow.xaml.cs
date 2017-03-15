@@ -12,17 +12,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using System.Net.NetworkInformation;
 using SimpleWifi;
+using NativeWifi;
 using System.IO;
 
 namespace LED_Control
@@ -32,27 +29,27 @@ namespace LED_Control
     /// </summary>
     public partial class ConfigWindow : Window
     {
-        private const int listenPort = 11000;
         public TcpClient Client;
-        public static String ServerIP;
-        public static String Message;
-        public String [] IPInfo;
         public ListBoxItem lastNetwork;
         Wifi wifi;
+
         public ConfigWindow(TcpClient Client)
         {
             Show();
             InitializeComponent();
-            passwordBox.Visibility = System.Windows.Visibility.Hidden;
-            ConnectButton.Visibility = System.Windows.Visibility.Hidden;
             this.Client = Client;
 
             wifi = new Wifi();
+            wifi.ConnectionStatusChanged += wifi_ConnectionStatusChanged;
             WifiSearch(wifi);
-            if (ConnectionControl.ConnectBluegiga(Client) == true) Infolabel.Content = "Połączono";
+            if (Client.Connected) infoLabel.Content = "Połączono ze sterownikiem";
+            else infoLabel.Content = "Sterownik niedostępny";
+        }
 
-            //StartListener();
-            //Connect_();
+        private void wifi_ConnectionStatusChanged(object sender, WifiStatusEventArgs e)
+        {
+            //WifiSearch(wifi);
+            //automatyczne odświeżanie listy sieci
         }
 
         private void WifiSearch(Wifi wifi)
@@ -69,91 +66,12 @@ namespace LED_Control
                         network.FontWeight = FontWeights.Bold;
                         lastNetwork = network;
                     }
-
                     listBox.Items.Add(network);
+                    var test = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault();
                 }
             }
-
         }
-
-        private void StartListener()
-        {
-            bool done = false;
-
-            UdpClient listener = new UdpClient(listenPort);
-            IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, listenPort);
-            IPEndPoint bluegiga = new IPEndPoint(IPAddress.Broadcast, 23);
-            listener.Send(new byte[] { 1, 2, 3, 4, 5 }, 5, bluegiga);
-            try
-            {
-               
-                while (!done)
-                {
-                    Console.WriteLine("Waiting for broadcast");
-                    byte[] bytes = listener.Receive(ref groupEP);
-
-                    Console.WriteLine("Received broadcast from {0} :\n {1}\n",
-                        groupEP.ToString(),
-                        Encoding.ASCII.GetString(bytes, 0, bytes.Length));
-                    Message = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
-
-                    if (Message=="HELLO")
-                    {
-                        ServerIP = groupEP.ToString();
-                        IPInfo = ServerIP.Split(':');
-                        WriteToFile(IPInfo);
-                        done = true;
-                    }
-                }
-
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-            finally
-            {
-                listener.Close();
-            }
-        }
-
-        private void WriteToFile(String [] IP)
-        {
-            string[] lines = {IP[0], IP[1]};
-            
-               var systemPath = System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-
-            using (StreamWriter outputFile = new StreamWriter(systemPath + @"\ConnectionInfo.txt"))
-            {
-                foreach (string line in lines)
-                    outputFile.WriteLine(line);
-            }
-        }
-
-        private void Connect_()
-        {
-            Client = new TcpClient();
-            IPAddress IP;
-            int port;
-            if (!Client.Connected)
-            {
-                if (IPAddress.TryParse(IPInfo[0], out IP) && int.TryParse(IPInfo[1], out port))
-                {
-                    try
-                    {
-                        Client.Connect(IP, port);
-                        Infolabel.Content = "Połączono";
-                    }
-                    catch (SocketException)
-                    {
-                        Infolabel.Content = "Serwer niedostępny";
-                    }
-                }
-                else Infolabel.Content = "Błędny format adresu IP lub portu";
-            }
-            else Infolabel.Content = "Połącznie wciąż aktywne";
-        }
-
+        
         private void nextButton_Click(object sender, RoutedEventArgs e)
         {
             LEDControl LED = new LEDControl(Client);
@@ -162,30 +80,35 @@ namespace LED_Control
 
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
-            //int index=listBox.Items.IndexOf(lastNetwork);
             lastNetwork.FontWeight = FontWeights.Regular;
-            // listBox.Items[index]
             if (listBox.SelectedItem != null)
             {
                 ListBoxItem network = listBox.SelectedItem as ListBoxItem;
                 string password = "";
-                if (!wifi.GetAccessPoints().Find(item => item.Name == network.Content.ToString()).HasProfile)
+                if (wifi.GetAccessPoints().Find(item => item.Name == network.Content.ToString()).IsSecure)
                 {
-                    password = passwordBox.Text;
+                    password = passwordBox.Password;
                 }
                 ConnectionControl.ConnectNetwork(wifi, network.Content.ToString(), password);
-                if (ConnectionControl.ConnectBluegiga(Client) == true)
+                if (wifi.ConnectionStatus == WifiStatus.Connected)
                 {
-                    MessageBoxResult result = MessageBox.Show("Połączono. Czy chcesz skonfigurować porty?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if(result== MessageBoxResult.Yes)
+                    if (wifi.GetAccessPoints().Find(item => item.IsConnected).Name == network.Content.ToString())
                     {
-                        LEDControl LED = new LEDControl(Client);
-                        this.Close();
+                        ConnectionControl.DeleteMemory();
+                        if (ConnectionControl.ConnectBluegiga(Client))
+                        {
+                            MessageBoxResult result = MessageBox.Show("Połączono. Czy chcesz skonfigurować porty?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                            if (result == MessageBoxResult.Yes)
+                            {
+                                LEDControl LED = new LEDControl(Client);
+                                this.Close();
+                            }
+                            infoLabel.Content = "Połączono";
+                        }
+                        else infoLabel.Content = "Brak połączenia";
                     }
-                    Infolabel.Content = "Połączono";
                 }
                 WifiSearch(wifi);
-
             }
         }
 
@@ -196,13 +119,11 @@ namespace LED_Control
                 selectedNetwork = (ListBoxItem)listBox.SelectedItem;
                 if (selectedNetwork.FontWeight == FontWeights.Bold)
                 {
-                    passwordBox.Visibility = System.Windows.Visibility.Hidden;
-                    ConnectButton.Visibility = System.Windows.Visibility.Hidden;
+                    networkPanel.Visibility = Visibility.Hidden;
                 }
                 else
                 {
-                    passwordBox.Visibility = System.Windows.Visibility.Visible;
-                    ConnectButton.Visibility = System.Windows.Visibility.Visible;
+                    networkPanel.Visibility = Visibility.Visible;
                 }
             }
             catch(NullReferenceException)
@@ -216,6 +137,19 @@ namespace LED_Control
 
         private void backButton_Click(object sender, RoutedEventArgs e)
         {
+        }
+
+        private void changeButton_Click(object sender, RoutedEventArgs e)
+        {
+            //WlanClient wlan = new WlanClient();
+            //var wlanInterface = wlan.Interfaces.ToList().Find(item => item.InterfaceState == Wlan.WlanInterfaceState.Connected);
+            //var bssid = wlanInterface.GetNetworkBssList();
+            string bssid = "";
+            byte[] message = Encoding.ASCII.GetBytes(bssid);
+            Stream stream = Client.GetStream();
+            stream.Write(message, 0, message.Length);
+            message = Encoding.ASCII.GetBytes("NETPW" + passwordBox.Password);
+            stream.Write(message, 0, message.Length);
         }
     }
 }

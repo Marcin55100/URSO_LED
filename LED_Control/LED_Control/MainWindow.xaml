@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LED_Control"
         mc:Ignorable="d"
-        Title="Menu" Height="350" Width="525">
+        Title="Menu" Height="350" Width="525"
+        ContentRendered="Window_ContentRendered" 
+        Loaded="Window_Loaded">
     <Grid >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -30,7 +32,7 @@
             <Button x:Name="ConfigButton"  Grid.Row="2"  Content="Konfiguracja połączenia" Click="ConfigButton_Click" />
             <!--<Label x:Name="Infolabel" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Row="3" Content="cos" /> -->
             <Viewbox Stretch="Uniform" Grid.Row="3">
-                <TextBlock Name="Infolabel" Text="Test" />
+                <TextBlock Name="Infolabel" Text="Łączę ze sterownikiem..." />
             </Viewbox>
         </Grid>
         <!--
