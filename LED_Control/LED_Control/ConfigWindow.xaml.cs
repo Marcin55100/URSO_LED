@@ -21,6 +21,7 @@ using System.Net.NetworkInformation;
 using SimpleWifi;
 using NativeWifi;
 using System.IO;
+using System.Threading;
 
 namespace LED_Control
 {
@@ -79,6 +80,11 @@ namespace LED_Control
         }
 
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
+        {
+            ConnectListNetwork();
+        }
+
+        private void ConnectListNetwork()
         {
             lastNetwork.FontWeight = FontWeights.Regular;
             if (listBox.SelectedItem != null)
@@ -141,15 +147,23 @@ namespace LED_Control
 
         private void changeButton_Click(object sender, RoutedEventArgs e)
         {
-            //WlanClient wlan = new WlanClient();
-            //var wlanInterface = wlan.Interfaces.ToList().Find(item => item.InterfaceState == Wlan.WlanInterfaceState.Connected);
-            //var bssid = wlanInterface.GetNetworkBssList();
-            string bssid = "";
-            byte[] message = Encoding.ASCII.GetBytes(bssid);
-            Stream stream = Client.GetStream();
-            stream.Write(message, 0, message.Length);
-            message = Encoding.ASCII.GetBytes("NETPW" + passwordBox.Password);
-            stream.Write(message, 0, message.Length);
+            if (listBox.SelectedItem != null)
+            {
+                ListBoxItem network = listBox.SelectedItem as ListBoxItem;
+                NetworkStream stream = Client.GetStream();
+                if (stream.CanWrite)
+                {
+                    //stream.WriteTimeout = 1000;
+                    byte[] message = Encoding.ASCII.GetBytes("BSSID" + network.Content.ToString());
+                    stream.Write(message, 0, message.Length);
+                    message = Encoding.ASCII.GetBytes("NETPW" + passwordBox.Password);
+                    stream.Write(message, 0, message.Length);
+                    Thread.Sleep(1000);
+                    stream.Close();
+                    Client.Close();
+                }
+                ConnectListNetwork();
+            }
         }
     }
 }
