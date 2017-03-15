@@ -21,7 +21,6 @@ namespace LED_Control
             if (this.PropertyChanged != null)
             {
                 this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
-
             }
 
         }
