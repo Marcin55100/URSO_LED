@@ -84,11 +84,20 @@ namespace LED_Control
             ConnectListNetwork();
         }
 
-        private void ConnectListNetwork()
+        private void ConnectListNetwork(int delay = 0)
         {
+            infoLabel.Content = "Łączę ze sterownikiem...";
+
+            var task = Task.Run(async delegate
+            {
+                await Task.Delay(delay);
+            });
+            task.Wait();
+
             lastNetwork.FontWeight = FontWeights.Regular;
             if (listBox.SelectedItem != null)
             {
+                Client = new TcpClient();
                 ListBoxItem network = listBox.SelectedItem as ListBoxItem;
                 string password = "";
                 if (wifi.GetAccessPoints().Find(item => item.Name == network.Content.ToString()).IsSecure)
@@ -143,6 +152,7 @@ namespace LED_Control
 
         private void backButton_Click(object sender, RoutedEventArgs e)
         {
+
         }
 
         private void changeButton_Click(object sender, RoutedEventArgs e)
@@ -153,20 +163,12 @@ namespace LED_Control
                 NetworkStream stream = Client.GetStream();
                 if (stream.CanWrite)
                 {
-                    //stream.WriteTimeout = 1000;
                     byte[] message = Encoding.ASCII.GetBytes("BSSID" + network.Content.ToString());
                     stream.Write(message, 0, message.Length);
                     message = Encoding.ASCII.GetBytes("NETPW" + passwordBox.Password);
                     stream.Write(message, 0, message.Length);
-                    //Thread.Sleep(5000);
-                    var delay = Task.Run(async delegate
-                    {
-                        await Task.Delay(3000);
-                    });
-                    delay.Wait();
-                    //stream.Close();
                 }
-                ConnectListNetwork();
+                ConnectListNetwork(15000);
             }
         }
     }
