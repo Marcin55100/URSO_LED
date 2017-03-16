@@ -159,6 +159,12 @@ namespace LED_Control
 
         private static TcpClient CreateTCPConnection(IPAddress IP, int port, TcpClient tcp)
         {
+            var delay = Task.Run(async delegate
+            {
+                await Task.Delay(100);
+            });
+            delay.Wait();
+
             try
             {
                 tcp.Connect(IP, port);

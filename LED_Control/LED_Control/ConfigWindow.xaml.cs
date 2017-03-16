@@ -158,9 +158,13 @@ namespace LED_Control
                     stream.Write(message, 0, message.Length);
                     message = Encoding.ASCII.GetBytes("NETPW" + passwordBox.Password);
                     stream.Write(message, 0, message.Length);
-                    Thread.Sleep(1000);
-                    stream.Close();
-                    Client.Close();
+                    //Thread.Sleep(5000);
+                    var delay = Task.Run(async delegate
+                    {
+                        await Task.Delay(3000);
+                    });
+                    delay.Wait();
+                    //stream.Close();
                 }
                 ConnectListNetwork();
             }
